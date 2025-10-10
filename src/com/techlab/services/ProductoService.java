@@ -1,4 +1,4 @@
-package com.techlab.servicios;
+package com.techlab.services;
 
 import com.techlab.productos.Producto;
 import java.util.ArrayList;
@@ -9,6 +9,17 @@ public class ProductoService {
   private ArrayList<Producto> productos = new ArrayList<Producto>();
   private static int nextId = 1;
 
+  /**
+   * Agrega un nuevo producto al sistema.
+   *
+   * @param nombre
+   *          El nombre del producto.
+   * @param precio
+   *          El precio del producto.
+   * @param stock
+   *          La cantidad en stock del producto.
+   * @return El producto creado.
+   */
   public Producto agregarProducto(String nombre, float precio, int stock) {
     Producto p = new Producto(nextId++, nombre, precio, stock);
     productos.add(p);

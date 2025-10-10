@@ -1,4 +1,4 @@
-package com.techlab.servicios;
+package com.techlab.services;
 
 import com.techlab.pedidos.Pedido;
 import java.util.ArrayList;

@@ -1,19 +1,17 @@
-
 import java.util.Scanner;
 
-import com.techlab.servicios.ManagerService;
+import com.techlab.managers.BusinessManager;
 import com.techlab.util.Console;
 
 public class App {
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        ManagerService manager = new ManagerService(scanner);
+        BusinessManager manager = new BusinessManager(scanner);
         manager.precargarProductos(); // Cargar algunos productos de ejemplo
 
         int opcion;
-
-        label: while (true) {
+        render: while (true) {
             Console.imprimirSeparador();
             mostrarMenu();
             opcion = scanner.nextInt();
@@ -31,7 +29,7 @@ public class App {
                 case 7 -> {
                     // Separador antes de salir
                     Console.imprimirEncabezado("Saliendo del sistema. ¡Hasta luego!");
-                    break label;
+                    break render;
                 }
                 default -> {
                     System.out.println("Opción inválida. Intente nuevamente.");
@@ -57,5 +55,4 @@ public class App {
                 "==================================================================================================");
         System.out.print("\nElija una opción: ");
     }
-
 }
