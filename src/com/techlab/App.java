@@ -1,17 +1,20 @@
-import java.util.Scanner;
+package com.techlab;
 
-import com.techlab.managers.BusinessManager;
+import java.util.Scanner;
 import com.techlab.util.Console;
+import com.techlab.managers.BusinessManager;
 
 public class App {
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        BusinessManager manager = new BusinessManager(scanner);
-        manager.precargarProductos(); // Cargar algunos productos de ejemplo
+        BusinessManager manager = new BusinessManager(scanner, true);
+        Console.limpiarPantalla();
 
         int opcion;
-        render: while (true) {
+        boolean menuActivo = true;
+
+        while (menuActivo) {
             Console.imprimirSeparador();
             mostrarMenu();
             opcion = scanner.nextInt();
@@ -29,30 +32,33 @@ public class App {
                 case 7 -> {
                     // Separador antes de salir
                     Console.imprimirEncabezado("Saliendo del sistema. ¡Hasta luego!");
-                    break render;
+                    menuActivo = false;
                 }
                 default -> {
                     System.out.println("Opción inválida. Intente nuevamente.");
                     Console.imprimirSeparador();
                 }
             }
-            Console.limpiarPantalla();
+
+            if (menuActivo)
+                Console.limpiarPantalla();
         }
         scanner.close();
     }
 
     private static void mostrarMenu() {
-        System.out.println(
-                "\n=================================== SISTEMA DE GESTIÓN - TECHLAB ==================================");
-        System.out.println("\n1) Agregar producto");
-        System.out.println("2) Listar productos");
-        System.out.println("3) Buscar/Actualizar producto");
-        System.out.println("4) Eliminar producto");
-        System.out.println("5) Crear un pedido");
-        System.out.println("6) Listar pedidos");
-        System.out.println("7) Salir");
-        System.out.println(
-                "==================================================================================================");
-        System.out.print("\nElija una opción: ");
+        Console.fluent()
+                .addLine(
+                        "=================================== SISTEMA DE GESTIÓN - TECHLAB ==================================")
+                .addLine("1) Agregar producto")
+                .addLine("2) Listar productos")
+                .addLine("3) Buscar/Actualizar producto")
+                .addLine("4) Eliminar producto")
+                .addLine("5) Crear un pedido")
+                .addLine("6) Listar pedidos")
+                .addLine("7) Salir")
+                .addLine(
+                        "==================================================================================================")
+                .addLine("\nElija una opción: ");
     }
 }

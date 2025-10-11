@@ -10,17 +10,20 @@ public class ProductoManager {
   private final ProductoService prodService;
   private final Scanner scanner;
 
-  public ProductoManager(Scanner scanner) {
-    this.prodService = new ProductoService();
+  public ProductoManager(Scanner scanner, ProductoService prodService) {
+    this(scanner, prodService, false);
+  }
+
+  public ProductoManager(Scanner scanner, ProductoService prodService, boolean precargar) {
+    this.prodService = prodService;
     this.scanner = scanner;
+    if (precargar) {
+      precargarProductos();
+    }
   }
 
   public void agregarProducto(String nombre, float precio, int stock) {
-    Producto producto = prodService.agregarProducto(
-        nombre,
-        precio,
-        stock);
-    System.out.println("Producto precargado: " + producto);
+    prodService.agregarProducto(nombre, precio, stock);
   }
 
   public void agregarProducto() {
@@ -81,6 +84,7 @@ public class ProductoManager {
     } catch (ProductoNoEncontradoException ex) {
       System.out.println(ex.getMessage());
     }
+
     Console.imprimirSeparador();
     Console.esperarEnter();
   }
@@ -124,7 +128,7 @@ public class ProductoManager {
     try {
       int id = Integer.parseInt(input);
       producto = prodService.buscarPorId(id).orElse(null);
-    } catch (NumberFormatException e) {
+    } catch (NumberFormatException _) {
       producto = prodService.buscarPorNombre(input).orElse(null);
     }
 
@@ -152,7 +156,7 @@ public class ProductoManager {
           break;
 
         System.out.println("El precio no puede ser negativo.");
-      } catch (NumberFormatException e) {
+      } catch (NumberFormatException _) {
         System.out.println("Ingrese un valor numérico válido para el precio.");
       }
     }
@@ -171,7 +175,7 @@ public class ProductoManager {
           break;
 
         System.out.println("El stock no puede ser negativo.");
-      } catch (NumberFormatException e) {
+      } catch (NumberFormatException _) {
         System.out.println("Ingrese un valor entero válido para el stock.");
       }
     }
@@ -181,67 +185,60 @@ public class ProductoManager {
   private float solicitarNuevoPrecio(float precioActual) {
     System.out.print("Nuevo precio (actual: " + precioActual + "): ");
     float p;
+    String inputPrecio;
 
     while (true) {
-      String inputPrecio = scanner.nextLine();
-      if (inputPrecio.isBlank()) {
-        System.out.println("El precio no puede estar vacío. Ingrese un valor válido.");
-        continue;
-      }
+      inputPrecio = scanner.nextLine();
 
       try {
-        p = Float.parseFloat(inputPrecio);
-      } catch (NumberFormatException e) {
-        System.out.println("Valor inválido. Ingrese un precio válido.");
-        continue;
-      }
+        if (!inputPrecio.isBlank()) {
+          p = Float.parseFloat(inputPrecio);
 
-      if (p < 0) {
-        System.out.println("El precio no puede ser negativo. Ingrese un valor válido.");
-      } else if (p == 0) {
-        System.out.println("El precio no puede ser cero. Ingrese un valor válido.");
-      } else if (p == precioActual) {
-        System.out.println("El precio es igual al actual. Ingrese un precio diferente.");
-      } else {
-        break;
+          if (p < 0)
+            System.out.println("El precio no puede ser negativo. Ingrese un valor válido.");
+          else if (p == 0)
+            System.out.println("El precio no puede ser cero. Ingrese un valor válido.");
+          else if (p == precioActual)
+            System.out.println("El precio es igual al actual. Ingrese un precio diferente.");
+          else
+            break;
+        } else
+          System.out.println("El precio no puede estar vacío. Ingrese un valor válido.");
+      } catch (NumberFormatException _) {
+        System.out.println("Valor inválido. Ingrese un precio válido.");
       }
     }
+
     return p;
   }
 
   private int solicitarNuevoStock(int stockActual) {
     System.out.print("Nuevo stock (actual: " + stockActual + "): ");
-    int s;
+    int nuevoStock;
+
     while (true) {
       String inputStock = scanner.nextLine();
 
-      if (inputStock.isBlank()) {
+      if (inputStock != null && !inputStock.isBlank()) {
+        try {
+          nuevoStock = Integer.parseInt(inputStock);
+
+          if (nuevoStock == stockActual)
+            System.out.println("El stock es igual al actual. Ingrese un stock diferente.");
+          else if (nuevoStock == 0)
+            System.out.println("El Stock no puede ser cero.");
+          else if (nuevoStock < 0)
+            System.out.println("El Stock no puede ser negativo.");
+          else
+            break;
+        } catch (NumberFormatException _) {
+          System.out.println("Valor inválido. Ingrese un stock válido.");
+        }
+      } else
         System.out.println("El stock no puede estar vacío. Ingrese un valor válido.");
-        continue;
-      }
-
-      try {
-        s = Integer.parseInt(inputStock);
-      } catch (NumberFormatException e) {
-        System.out.println("Valor inválido. Ingrese un stock válido.");
-        continue;
-      }
-
-      if (s == stockActual) {
-        System.out.println("El stock es igual al actual. Ingrese un stock diferente.");
-        continue;
-      } else if (s == 0) {
-        System.out.println("El Stock no puede ser cero.");
-        continue;
-      } else if (s < 0) {
-        System.out.println("El Stock no puede ser negativo.");
-        continue;
-      } else {
-        break;
-      }
-
     }
-    return s;
+
+    return nuevoStock;
   }
 
   private String solicitarNuevoNombre(String nombreActual) {
@@ -263,5 +260,16 @@ public class ProductoManager {
     }
 
     return nombre;
+  }
+
+  public void precargarProductos() {
+    agregarProducto("Café Premium", 1500.5f, 10);
+    agregarProducto("Té Verde", 1200.0f, 20);
+    agregarProducto("Yerba Mate", 900.0f, 15);
+    agregarProducto("Azúcar", 500.0f, 30);
+    agregarProducto("Leche", 800.0f, 25);
+    agregarProducto("Galletas", 600.0f, 40);
+    agregarProducto("Mermelada", 1100.0f, 12);
+    agregarProducto("Pan Integral", 700.0f, 18);
   }
 }

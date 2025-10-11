@@ -1,12 +1,13 @@
 package com.techlab.managers;
 
+import com.techlab.excepciones.ProductoNoEncontradoException;
 import com.techlab.pedidos.LineaPedido;
 import com.techlab.pedidos.Pedido;
+import com.techlab.pedidos.SeleccionPedido;
 import com.techlab.productos.Producto;
 import com.techlab.services.PedidoService;
 import com.techlab.services.ProductoService;
 import com.techlab.util.Console;
-import java.util.ArrayList;
 import java.util.Scanner;
 
 public class PedidoManager {
@@ -14,9 +15,9 @@ public class PedidoManager {
   private final ProductoService prodService;
   private final Scanner scanner;
 
-  public PedidoManager(Scanner scanner) {
-    this.pedidoService = new PedidoService();
-    this.prodService = new ProductoService();
+  public PedidoManager(Scanner scanner, PedidoService pedidoService, ProductoService prodService) {
+    this.pedidoService = pedidoService;
+    this.prodService = prodService;
     this.scanner = scanner;
   }
 
@@ -95,16 +96,13 @@ public class PedidoManager {
 
     prodService.getProductos().forEach(System.out::println);
 
-    while (true) {
+    boolean seguir = true;
+    while (seguir) {
       System.out.print("Ingrese el ID o nombre del producto a agregar: ");
 
       try {
         Producto producto = buscarProducto();
         int cantidad = solicitarCantidadParaProducto(producto);
-
-        if (cantidad == 0) {
-          continue;
-        }
 
         seleccion.productos.add(producto);
         seleccion.cantidades.add(cantidad);
@@ -117,7 +115,7 @@ public class PedidoManager {
       String resp = scanner.nextLine();
 
       if (!resp.equalsIgnoreCase("s"))
-        break;
+        seguir = false;
     }
 
     return seleccion;
@@ -130,12 +128,12 @@ public class PedidoManager {
     try {
       int id = Integer.parseInt(input);
       producto = prodService.buscarPorId(id).orElse(null);
-    } catch (NumberFormatException e) {
+    } catch (NumberFormatException _) {
       producto = prodService.buscarPorNombre(input).orElse(null);
     }
 
     if (producto == null) {
-      throw new RuntimeException("Producto no encontrado.");
+      throw new ProductoNoEncontradoException("Producto no encontrado.");
     }
 
     return producto;
@@ -150,32 +148,21 @@ public class PedidoManager {
 
       try {
         cantidad = Integer.parseInt(cantInput);
-        if (cantidad <= 0) {
+
+        if (cantidad <= 0)
           System.out.println("La cantidad debe ser mayor a cero.");
-          continue;
-        }
 
         if (cantidad > producto.getStock()) {
           System.out.println("Stock insuficiente. Stock disponible: " + producto.getStock());
-          System.out.print("¿Desea ingresar otra cantidad? (s/n): ");
-          String resp = scanner.nextLine();
+          System.out.print("Ingrese una cantidad válida (1-" + producto.getStock() + "): ");
+        }
 
-          if (resp.equalsIgnoreCase("s"))
-            continue;
-          else
-            return 0;
-
-        } else
-          return cantidad;
-
-      } catch (NumberFormatException ex) {
+        if (cantidad > 0 && cantidad <= producto.getStock())
+          break;
+      } catch (NumberFormatException _) {
         System.out.println("Ingrese un número válido para la cantidad.");
       }
     }
-  }
-
-  private class SeleccionPedido {
-    ArrayList<Producto> productos = new ArrayList<>();
-    ArrayList<Integer> cantidades = new ArrayList<>();
+    return cantidad;
   }
 }

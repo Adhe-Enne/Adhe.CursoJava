@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PedidoService {
-  private List<Pedido> pedidos = new ArrayList<Pedido>();
+  private List<Pedido> pedidos = new ArrayList<>();
   private int nextId = 1;
 
   public Pedido crearPedido() {

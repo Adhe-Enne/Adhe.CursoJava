@@ -5,6 +5,27 @@ import java.util.Scanner;
 public class Console {
   private static Scanner scanner = new Scanner(System.in);
 
+  private Console() {
+    super();
+  }
+
+  public static Console fluent() {
+    return new Console();
+  }
+
+  public Console addLine(String message) {
+    System.out.println(message);
+    return this;
+  }
+
+  public static void cout(String message) {
+    System.out.print(message);
+  }
+
+  public static void cout(Exception exception) {
+    System.out.print(exception.getMessage());
+  }
+
   // Método para imprimir la línea separadora
   public static void imprimirSeparador() {
     System.out
@@ -13,7 +34,7 @@ public class Console {
 
   public static void imprimirEncabezado(String titulo) {
     imprimirSeparador();
-    System.out.println("\n--- " + titulo + " ---");
+    System.out.println("--- " + titulo + " ---");
     imprimirSeparador();
   }
 
@@ -36,9 +57,12 @@ public class Console {
         System.out.print("\033[H\033[2J");
         System.out.flush();
       }
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+      cout(e);
     } catch (Exception e) {
       // Si falla, simplemente no limpia la pantalla, pero no deberia fallar nunca....
+      cout(e);
     }
   }
-
 }

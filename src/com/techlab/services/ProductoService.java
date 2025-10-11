@@ -6,24 +6,17 @@ import java.util.List;
 import java.util.Optional;
 
 public class ProductoService {
-  private ArrayList<Producto> productos = new ArrayList<Producto>();
+  private ArrayList<Producto> productos = new ArrayList<>();
   private static int nextId = 1;
 
-  /**
-   * Agrega un nuevo producto al sistema.
-   *
-   * @param nombre
-   *          El nombre del producto.
-   * @param precio
-   *          El precio del producto.
-   * @param stock
-   *          La cantidad en stock del producto.
-   * @return El producto creado.
-   */
   public Producto agregarProducto(String nombre, float precio, int stock) {
-    Producto p = new Producto(nextId++, nombre, precio, stock);
+    Producto p = new Producto(getNextId(), nombre, precio, stock);
     productos.add(p);
     return p;
+  }
+
+  public static int getNextId() {
+    return nextId++;
   }
 
   public List<Producto> getProductos() {
