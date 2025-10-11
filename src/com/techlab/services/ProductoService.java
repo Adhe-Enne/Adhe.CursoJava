@@ -28,7 +28,6 @@ public class ProductoService {
   }
 
   public Optional<Producto> buscarPorNombre(String nombre) {
-
     return productos.stream()
         .filter(
             p -> p.getNombre().equalsIgnoreCase(nombre) || p.getNombre().toLowerCase().startsWith(nombre.toLowerCase()))

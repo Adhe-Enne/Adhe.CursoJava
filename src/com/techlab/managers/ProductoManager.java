@@ -11,15 +11,8 @@ public class ProductoManager {
   private final Scanner scanner;
 
   public ProductoManager(Scanner scanner, ProductoService prodService) {
-    this(scanner, prodService, false);
-  }
-
-  public ProductoManager(Scanner scanner, ProductoService prodService, boolean precargar) {
     this.prodService = prodService;
     this.scanner = scanner;
-    if (precargar) {
-      precargarProductos();
-    }
   }
 
   public void agregarProducto(String nombre, float precio, int stock) {
@@ -29,7 +22,7 @@ public class ProductoManager {
   public void agregarProducto() {
     Console.imprimirEncabezado("Agregar Producto");
 
-    System.out.print("Nombre: ");
+    Console.cout("Nombre: ");
     String nombre = scanner.nextLine();
     float precio = solicitarPrecio();
     int stock = solicitarStock();
@@ -42,11 +35,10 @@ public class ProductoManager {
   public void listarProductos() {
     Console.imprimirEncabezado("Lista de Productos");
 
-    if (prodService.getProductos().isEmpty()) {
-      System.out.println("No hay productos registrados.");
-    } else {
-      prodService.getProductos().forEach(System.out::println);
-    }
+    if (prodService.getProductos().isEmpty())
+      Console.coutln("No hay productos registrados.");
+    else
+      prodService.getProductos().forEach(p -> Console.coutln(p.toString()));
 
     Console.imprimirSeparador();
     Console.esperarEnter();
@@ -56,7 +48,7 @@ public class ProductoManager {
     Console.imprimirEncabezado("Buscar/Actualizar Producto");
 
     try {
-      System.out.print("Ingrese el ID o el nombre del producto: ");
+      Console.cout("Ingrese el ID o el nombre del producto: ");
       Producto producto = buscarProducto();
       Console.imprimirEncabezado("Producto encontrado: " + producto);
 
@@ -71,18 +63,16 @@ public class ProductoManager {
       int nuevoStock = solicitarNuevoStock(producto.getStock());
       producto.setStock(nuevoStock);
 
-      System.out.print("¿Desea cambiar el nombre del producto? (s/n): ");
+      Console.cout("¿Desea cambiar el nombre del producto? (s/n): ");
       String cambiarNombre = scanner.nextLine();
 
-      if (cambiarNombre.equalsIgnoreCase("s")) {
-        String nuevoNombre = solicitarNuevoNombre(producto.getNombre());
-        producto.setNombre(nuevoNombre);
-      }
+      if (cambiarNombre.equalsIgnoreCase("s"))
+        producto.setNombre(solicitarNuevoNombre(producto.getNombre()));
 
       Console.imprimirSeparador();
-      System.out.println("Producto actualizado: " + producto);
+      Console.coutln("Producto actualizado: " + producto);
     } catch (ProductoNoEncontradoException ex) {
-      System.out.println(ex.getMessage());
+      Console.coutln(ex.getMessage());
     }
 
     Console.imprimirSeparador();
@@ -93,11 +83,11 @@ public class ProductoManager {
     Console.imprimirEncabezado("Eliminar Producto");
 
     try {
-      System.out.print("Ingrese el ID o el nombre del producto a eliminar: ");
+      Console.cout("Ingrese el ID o el nombre del producto a eliminar: ");
       Producto producto = buscarProducto();
 
       Console.imprimirEncabezado("Producto encontrado: " + producto);
-      System.out.print("¿Está seguro que desea eliminar este producto? (s/n): ");
+      Console.cout("¿Está seguro que desea eliminar este producto? (s/n): ");
 
       String resp = scanner.nextLine();
 
@@ -106,15 +96,12 @@ public class ProductoManager {
         return;
       }
 
-      boolean eliminado = prodService.eliminarProducto(producto.getId());
-
-      if (eliminado) {
-        System.out.println("Producto eliminado correctamente.");
-      } else {
-        System.out.println("No se pudo eliminar el producto.");
-      }
+      if (prodService.eliminarProducto(producto.getId()))
+        Console.coutln("Producto eliminado correctamente.");
+      else
+        Console.coutln("No se pudo eliminar el producto.");
     } catch (ProductoNoEncontradoException ex) {
-      System.out.println(ex.getMessage());
+      Console.coutln(ex.getMessage());
     }
 
     Console.imprimirSeparador();
@@ -132,32 +119,33 @@ public class ProductoManager {
       producto = prodService.buscarPorNombre(input).orElse(null);
     }
 
-    if (producto == null) {
+    if (producto == null)
       throw new ProductoNoEncontradoException("Producto no encontrado.");
-    }
 
     return producto;
   }
 
   private boolean confirmarActualizacion() {
-    System.out.print("¿Desea actualizar este producto? (s/n): ");
+    Console.cout("¿Desea actualizar este producto? (s/n): ");
     String resp = scanner.nextLine();
     return resp.equalsIgnoreCase("s");
   }
 
   private float solicitarPrecio() {
     float precio = 0f;
+
     while (true) {
-      System.out.print("Precio: ");
+      Console.cout("Precio: ");
       String input = scanner.nextLine();
+
       try {
         precio = Float.parseFloat(input);
         if (precio > 0)
           break;
 
-        System.out.println("El precio no puede ser negativo.");
+        Console.coutln("El precio no puede ser negativo.");
       } catch (NumberFormatException _) {
-        System.out.println("Ingrese un valor numérico válido para el precio.");
+        Console.coutln("Ingrese un valor numérico válido para el precio.");
       }
     }
     return precio;
@@ -165,26 +153,28 @@ public class ProductoManager {
 
   private int solicitarStock() {
     int stock = 0;
+
     while (true) {
-      System.out.print("Stock: ");
+      Console.cout("Stock: ");
       String input = scanner.nextLine();
+
       try {
         stock = Integer.parseInt(input);
 
         if (stock > 0)
           break;
 
-        System.out.println("El stock no puede ser negativo.");
+        Console.coutln("El stock no puede ser negativo.");
       } catch (NumberFormatException _) {
-        System.out.println("Ingrese un valor entero válido para el stock.");
+        Console.coutln("Ingrese un valor entero válido para el stock.");
       }
     }
     return stock;
   }
 
   private float solicitarNuevoPrecio(float precioActual) {
-    System.out.print("Nuevo precio (actual: " + precioActual + "): ");
-    float p;
+    Console.cout("Nuevo precio (actual: " + precioActual + "): ");
+    float p = 0f;
     String inputPrecio;
 
     while (true) {
@@ -193,28 +183,26 @@ public class ProductoManager {
       try {
         if (!inputPrecio.isBlank()) {
           p = Float.parseFloat(inputPrecio);
-
           if (p < 0)
-            System.out.println("El precio no puede ser negativo. Ingrese un valor válido.");
+            Console.coutln("El precio no puede ser negativo. Ingrese un valor válido.");
           else if (p == 0)
-            System.out.println("El precio no puede ser cero. Ingrese un valor válido.");
+            Console.coutln("El precio no puede ser cero. Ingrese un valor válido.");
           else if (p == precioActual)
-            System.out.println("El precio es igual al actual. Ingrese un precio diferente.");
+            Console.coutln("El precio es igual al actual. Ingrese un precio diferente.");
           else
             break;
         } else
-          System.out.println("El precio no puede estar vacío. Ingrese un valor válido.");
+          Console.coutln("El precio no puede estar vacío. Ingrese un valor válido.");
       } catch (NumberFormatException _) {
-        System.out.println("Valor inválido. Ingrese un precio válido.");
+        Console.coutln("Valor inválido. Ingrese un precio válido.");
       }
     }
-
     return p;
   }
 
   private int solicitarNuevoStock(int stockActual) {
-    System.out.print("Nuevo stock (actual: " + stockActual + "): ");
-    int nuevoStock;
+    Console.cout("Nuevo stock (actual: " + stockActual + "): ");
+    int nuevoStock = 0;
 
     while (true) {
       String inputStock = scanner.nextLine();
@@ -222,54 +210,39 @@ public class ProductoManager {
       if (inputStock != null && !inputStock.isBlank()) {
         try {
           nuevoStock = Integer.parseInt(inputStock);
-
           if (nuevoStock == stockActual)
-            System.out.println("El stock es igual al actual. Ingrese un stock diferente.");
+            Console.coutln("El stock es igual al actual. Ingrese un stock diferente.");
           else if (nuevoStock == 0)
-            System.out.println("El Stock no puede ser cero.");
+            Console.coutln("El Stock no puede ser cero.");
           else if (nuevoStock < 0)
-            System.out.println("El Stock no puede ser negativo.");
+            Console.coutln("El Stock no puede ser negativo.");
           else
             break;
         } catch (NumberFormatException _) {
-          System.out.println("Valor inválido. Ingrese un stock válido.");
+          Console.coutln("Valor inválido. Ingrese un stock válido.");
         }
       } else
-        System.out.println("El stock no puede estar vacío. Ingrese un valor válido.");
+        Console.coutln("El stock no puede estar vacío. Ingrese un valor válido.");
     }
-
     return nuevoStock;
   }
 
   private String solicitarNuevoNombre(String nombreActual) {
     String nombre;
-    System.out.print("Nuevo nombre (actual: " + nombreActual + "): ");
+    Console.cout("Nuevo nombre (actual: " + nombreActual + "): ");
 
     while (true) {
       nombre = scanner.nextLine();
 
-      if (nombre.isBlank()) {
-        System.out.println("El nombre no puede estar vacío.");
-      } else if (nombre.equalsIgnoreCase(nombreActual)) {
-        System.out
-            .println("El nombre es igual al actual. Ingrese un nombre diferente o deje vacío para mantener el actual.");
-      } else if (prodService.buscarPorNombre(nombre).isPresent()) {
-        System.out.println("Ya existe un producto con ese nombre. Ingrese un nombre diferente.");
-      } else
+      if (nombre.isBlank())
+        Console.coutln("El nombre no puede estar vacío.");
+      else if (nombre.equalsIgnoreCase(nombreActual)) {
+        Console.coutln("El nombre es igual al actual. Ingrese un nombre diferente.");
+      } else if (prodService.buscarPorNombre(nombre).isPresent())
+        Console.coutln("Ya existe un producto con ese nombre. Ingrese un nombre diferente.");
+      else
         break;
     }
-
     return nombre;
-  }
-
-  public void precargarProductos() {
-    agregarProducto("Café Premium", 1500.5f, 10);
-    agregarProducto("Té Verde", 1200.0f, 20);
-    agregarProducto("Yerba Mate", 900.0f, 15);
-    agregarProducto("Azúcar", 500.0f, 30);
-    agregarProducto("Leche", 800.0f, 25);
-    agregarProducto("Galletas", 600.0f, 40);
-    agregarProducto("Mermelada", 1100.0f, 12);
-    agregarProducto("Pan Integral", 700.0f, 18);
   }
 }

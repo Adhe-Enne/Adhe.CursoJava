@@ -18,6 +18,10 @@ public class Console {
     return this;
   }
 
+  public static void coutln(String message) {
+    System.out.println(message);
+  }
+
   public static void cout(String message) {
     System.out.print(message);
   }
@@ -26,7 +30,6 @@ public class Console {
     System.out.print(exception.getMessage());
   }
 
-  // Método para imprimir la línea separadora
   public static void imprimirSeparador() {
     System.out
         .println("==================================================================================================");

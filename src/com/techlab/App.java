@@ -35,7 +35,7 @@ public class App {
                     menuActivo = false;
                 }
                 default -> {
-                    System.out.println("Opción inválida. Intente nuevamente.");
+                    Console.coutln("Opción inválida. Intente nuevamente.");
                     Console.imprimirSeparador();
                 }
             }

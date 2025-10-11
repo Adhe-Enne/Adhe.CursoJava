@@ -1,13 +1,13 @@
 package com.techlab.managers;
 
 import com.techlab.excepciones.ProductoNoEncontradoException;
-import com.techlab.pedidos.LineaPedido;
-import com.techlab.pedidos.Pedido;
-import com.techlab.pedidos.SeleccionPedido;
+import com.techlab.pedidos.*;
 import com.techlab.productos.Producto;
-import com.techlab.services.PedidoService;
-import com.techlab.services.ProductoService;
+import com.techlab.services.*;
 import com.techlab.util.Console;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 public class PedidoManager {
@@ -23,9 +23,9 @@ public class PedidoManager {
 
   public void crearPedido() {
     Console.imprimirEncabezado("Crear Pedido");
-    SeleccionPedido seleccion = seleccionarProductosParaPedido();
+    List<SeleccionLinea> lineas = seleccionarLineas();
 
-    if (seleccion.productos.isEmpty()) {
+    if (lineas.isEmpty()) {
       Console.imprimirFinProceso("No se seleccionaron productos para el pedido.");
       return;
     }
@@ -34,16 +34,16 @@ public class PedidoManager {
     Console.imprimirEncabezado("Resumen de productos seleccionados para el pedido");
     float total = 0f;
 
-    for (int i = 0; i < seleccion.productos.size(); i++) {
-      Producto p = seleccion.productos.get(i);
-      int cant = seleccion.cantidades.get(i);
-      System.out.println(p + " | Cantidad: " + cant + " | Subtotal: $" + (p.getPrecio() * cant));
+    for (SeleccionLinea linea : lineas) {
+      Producto p = linea.getProducto();
+      int cant = linea.getCantidad();
+      Console.coutln(p + " | Cantidad: " + cant + " | Subtotal: $" + (p.getPrecio() * cant));
       total += p.getPrecio() * cant;
     }
 
     Console.imprimirEncabezado("Total del pedido: $" + total);
 
-    System.out.print("¿Confirmar pedido? (s/n): ");
+    Console.cout("¿Confirmar pedido? (s/n): ");
     String confirmar = scanner.nextLine();
 
     if (!confirmar.equalsIgnoreCase("s")) {
@@ -53,9 +53,9 @@ public class PedidoManager {
 
     Pedido pedido = pedidoService.crearPedido();
 
-    for (int i = 0; i < seleccion.productos.size(); i++) {
-      Producto p = seleccion.productos.get(i);
-      int cant = seleccion.cantidades.get(i);
+    for (SeleccionLinea linea : lineas) {
+      Producto p = linea.getProducto();
+      int cant = linea.getCantidad();
       p.setStock(p.getStock() - cant);
       pedido.agregarLinea(new LineaPedido(p, cant, 0, pedido.getId()));
     }
@@ -74,51 +74,51 @@ public class PedidoManager {
 
     for (Pedido pedido : pedidoService.getPedidos()) {
       Console.imprimirSeparador();
-      System.out.println("\nPedido ID: " + pedido.getId());
+      Console.coutln("\nPedido ID: " + pedido.getId());
       float total = 0f;
 
       for (LineaPedido linea : pedido.getLineas()) {
         float subtotal = linea.getProducto().getPrecio() * linea.getCantidad();
         total += subtotal;
-        System.out.println("  - " + linea.getProducto().getNombre() + " | Cantidad: " + linea.getCantidad()
+        Console.coutln("  - " + linea.getProducto().getNombre() + " | Cantidad: " + linea.getCantidad()
             + " | Subtotal: $" + subtotal);
       }
-      System.out.println("  Total: $" + total);
+      Console.coutln("  Total: $" + total);
       Console.imprimirSeparador();
     }
 
     Console.esperarEnter();
   }
 
-  private SeleccionPedido seleccionarProductosParaPedido() {
-    SeleccionPedido seleccion = new SeleccionPedido();
-    System.out.println("\nProductos disponibles:");
+  private List<SeleccionLinea> seleccionarLineas() {
+    List<SeleccionLinea> lineas = new ArrayList<>();
 
-    prodService.getProductos().forEach(System.out::println);
+    Console.coutln("\nProductos disponibles:");
+
+    prodService.getProductos().forEach(p -> Console.coutln(p.toString()));
 
     boolean seguir = true;
     while (seguir) {
-      System.out.print("Ingrese el ID o nombre del producto a agregar: ");
+      Console.cout("Ingrese el ID o nombre del producto a agregar: ");
 
       try {
         Producto producto = buscarProducto();
         int cantidad = solicitarCantidadParaProducto(producto);
 
-        seleccion.productos.add(producto);
-        seleccion.cantidades.add(cantidad);
+        lineas.add(new SeleccionLinea(producto, cantidad));
       } catch (Exception ex) {
-        System.out.println(ex.getMessage() + " Intente nuevamente.");
+        Console.coutln(ex.getMessage() + " Intente nuevamente.");
         continue;
       }
 
-      System.out.print("¿Desea agregar otro producto al pedido? (s/n): ");
+      Console.cout("¿Desea agregar otro producto al pedido? (s/n): ");
       String resp = scanner.nextLine();
 
       if (!resp.equalsIgnoreCase("s"))
         seguir = false;
     }
 
-    return seleccion;
+    return lineas;
   }
 
   private Producto buscarProducto() {
@@ -132,9 +132,8 @@ public class PedidoManager {
       producto = prodService.buscarPorNombre(input).orElse(null);
     }
 
-    if (producto == null) {
+    if (producto == null)
       throw new ProductoNoEncontradoException("Producto no encontrado.");
-    }
 
     return producto;
   }
@@ -143,24 +142,24 @@ public class PedidoManager {
     int cantidad = 0;
 
     while (true) {
-      System.out.print("Cantidad a agregar: ");
+      Console.cout("Cantidad a agregar: ");
       String cantInput = scanner.nextLine();
 
       try {
         cantidad = Integer.parseInt(cantInput);
 
         if (cantidad <= 0)
-          System.out.println("La cantidad debe ser mayor a cero.");
+          Console.coutln("La cantidad debe ser mayor a cero.");
 
         if (cantidad > producto.getStock()) {
-          System.out.println("Stock insuficiente. Stock disponible: " + producto.getStock());
-          System.out.print("Ingrese una cantidad válida (1-" + producto.getStock() + "): ");
+          Console.coutln("Stock insuficiente. Stock disponible: " + producto.getStock());
+          Console.cout("Ingrese una cantidad válida (1-" + producto.getStock() + "): ");
         }
 
         if (cantidad > 0 && cantidad <= producto.getStock())
           break;
       } catch (NumberFormatException _) {
-        System.out.println("Ingrese un número válido para la cantidad.");
+        Console.coutln("Ingrese un número válido para la cantidad.");
       }
     }
     return cantidad;
