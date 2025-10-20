@@ -22,6 +22,12 @@ public class PedidoManager {
   }
 
   public void crearPedido() {
+    if (!this.prodService.existenProductosConStock()) {
+      Console.coutln(
+          "No hay productos con stock disponible para crear un pedido. Por favor, agrega productos al inventario.");
+      return;
+    }
+
     Console.imprimirEncabezado("Crear Pedido");
     List<SeleccionLinea> lineas = seleccionarLineas();
 

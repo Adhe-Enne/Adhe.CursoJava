@@ -37,4 +37,8 @@ public class ProductoService {
   public boolean eliminarProducto(int id) {
     return productos.removeIf(p -> p.getId() == id);
   }
+
+  public boolean existenProductosConStock() {
+    return !productos.isEmpty() && productos.stream().anyMatch(p -> p.getStock() > 0);
+  }
 }
