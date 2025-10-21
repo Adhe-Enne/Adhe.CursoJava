@@ -3,16 +3,17 @@ package com.techlab.pedidos;
 import com.techlab.productos.Producto;
 
 public class LineaPedido {
+  private static int nextId = 1;
   private Producto producto;
   private int productoId;
   private int cantidad;
   private int id;
   private int pedidoId;
 
-  public LineaPedido(int productoId, int cantidad, int id, int pedidoId) {
+  public LineaPedido(int productoId, int cantidad, int pedidoId) {
     this.productoId = productoId;
     this.cantidad = cantidad;
-    this.id = id;
+    this.id = nextId++;
     this.pedidoId = pedidoId;
   }
 

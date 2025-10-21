@@ -61,9 +61,13 @@ public class BusinessManager {
     productoManager.agregarProducto("Galletas", 600.0f, 40);
     productoManager.agregarProducto("Mermelada", 1100.0f, 12);
     productoManager.agregarProducto("Pan Integral", 700.0f, 18);
-    int lineaId = 1;
+
     Pedido pedido = pedidoManager.agregarPedido();
-    pedido.agregarLinea(new LineaPedido(1, 10, lineaId, pedido.getId()));
-    pedido.agregarLinea(new LineaPedido(3, 5, ++lineaId, pedido.getId()));
+    pedido.agregarLinea(new LineaPedido(1, 10, pedido.getId()));
+    pedido.agregarLinea(new LineaPedido(3, 5, pedido.getId()));
+
+    Pedido pedido2 = pedidoManager.agregarPedido();
+    pedido2.agregarLinea(new LineaPedido(2, 8, pedido2.getId()));
+    pedido2.agregarLinea(new LineaPedido(4, 12, pedido2.getId()));
   }
 }

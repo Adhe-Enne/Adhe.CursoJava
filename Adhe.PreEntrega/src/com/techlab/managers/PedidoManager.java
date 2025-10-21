@@ -62,12 +62,11 @@ public class PedidoManager {
     }
 
     Pedido pedido = pedidoService.crearPedido();
-    int lineaId = 1;
     for (SeleccionLinea linea : lineas) {
       Producto p = linea.getProducto();
       int cant = linea.getCantidad();
       p.setStock(p.getStock() - cant);
-      pedido.agregarLinea(new LineaPedido(p.getId(), cant, lineaId++, pedido.getId()));
+      pedido.agregarLinea(new LineaPedido(p.getId(), cant, pedido.getId()));
     }
 
     Console.imprimirEncabezado("Pedido creado exitosamente. ID: " + pedido.getId());
@@ -93,8 +92,9 @@ public class PedidoManager {
         float subtotal = productoLinea.getPrecio() * linea.getCantidad();
         total += subtotal;
 
-        Console.coutln("  - " + productoLinea.getNombre() + " | Cantidad: " + linea.getCantidad()
-            + " | Subtotal: $" + subtotal);
+        Console.coutln(
+            " ID Linea: " + linea.getId() + " - " + productoLinea.getNombre() + " | Cantidad: " + linea.getCantidad()
+                + " | Subtotal: $" + subtotal);
       }
 
       Console.coutln("  Total: $" + total);
