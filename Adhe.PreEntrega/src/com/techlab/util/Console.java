@@ -9,6 +9,19 @@ public class Console {
     super();
   }
 
+  public static boolean confirmar(String mensaje) {
+    while (true) {
+      cout(mensaje + " (s/n): ");
+      String respuesta = scanner.nextLine().trim().toLowerCase();
+      if (respuesta.equals("s") || respuesta.equals("si")) {
+        return true;
+      } else if (respuesta.equals("n") || respuesta.equals("no")) {
+        return false;
+      }
+      coutln("Respuesta no reconocida. Intente nuevamente.");
+    }
+  }
+
   public static Console fluent() {
     return new Console();
   }
@@ -16,6 +29,18 @@ public class Console {
   public Console addLine(String message) {
     System.out.println(message);
     return this;
+  }
+
+  public static int leerEntero(String prompt) {
+    System.out.print(prompt);
+    int value = scanner.nextInt();
+    scanner.nextLine(); // Consumir el salto de línea
+    return value;
+  }
+
+  public static String leerTexto(String prompt) {
+    System.out.print(prompt);
+    return scanner.nextLine();
   }
 
   public static void coutln(String message) {

@@ -4,15 +4,24 @@ import com.techlab.productos.Producto;
 
 public class LineaPedido {
   private Producto producto;
+  private int productoId;
   private int cantidad;
   private int id;
   private int pedidoId;
 
-  public LineaPedido(Producto producto, int cantidad, int id, int pedidoId) {
-    this.producto = producto;
+  public LineaPedido(int productoId, int cantidad, int id, int pedidoId) {
+    this.productoId = productoId;
     this.cantidad = cantidad;
     this.id = id;
     this.pedidoId = pedidoId;
+  }
+
+  public int getProductoId() {
+    return productoId;
+  }
+
+  public void setProductoId(int productoId) {
+    this.productoId = productoId;
   }
 
   public Producto getProducto() {

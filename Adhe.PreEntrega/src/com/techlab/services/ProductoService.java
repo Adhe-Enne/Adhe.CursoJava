@@ -3,7 +3,6 @@ package com.techlab.services;
 import com.techlab.productos.Producto;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 public class ProductoService {
   private ArrayList<Producto> productos = new ArrayList<>();
@@ -23,15 +22,20 @@ public class ProductoService {
     return productos;
   }
 
-  public Optional<Producto> buscarPorId(int id) {
-    return productos.stream().filter(p -> p.getId() == id).findFirst();
+  public Producto buscarPorId(int id) {
+    return productos.stream().filter(p -> p.getId() == id).findFirst().orElse(null);
   }
 
-  public Optional<Producto> buscarPorNombre(String nombre) {
+  public Producto buscarPorNombre(String nombre) {
     return productos.stream()
         .filter(
             p -> p.getNombre().equalsIgnoreCase(nombre) || p.getNombre().toLowerCase().startsWith(nombre.toLowerCase()))
-        .findFirst();
+        .findFirst()
+        .orElse(null);
+  }
+
+  public boolean existeProducto(String nombre) {
+    return productos.stream().anyMatch(p -> p.getNombre().equalsIgnoreCase(nombre));
   }
 
   public boolean eliminarProducto(int id) {

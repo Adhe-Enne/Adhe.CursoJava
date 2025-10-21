@@ -21,6 +21,10 @@ public class PedidoManager {
     this.scanner = scanner;
   }
 
+  public Pedido agregarPedido() {
+    return this.pedidoService.crearPedido();
+  }
+
   public void crearPedido() {
     if (!this.prodService.existenProductosConStock()) {
       Console.coutln(
@@ -58,12 +62,12 @@ public class PedidoManager {
     }
 
     Pedido pedido = pedidoService.crearPedido();
-
+    int lineaId = 1;
     for (SeleccionLinea linea : lineas) {
       Producto p = linea.getProducto();
       int cant = linea.getCantidad();
       p.setStock(p.getStock() - cant);
-      pedido.agregarLinea(new LineaPedido(p, cant, 0, pedido.getId()));
+      pedido.agregarLinea(new LineaPedido(p.getId(), cant, lineaId++, pedido.getId()));
     }
 
     Console.imprimirEncabezado("Pedido creado exitosamente. ID: " + pedido.getId());
@@ -72,6 +76,7 @@ public class PedidoManager {
 
   public void listarPedidos() {
     Console.imprimirEncabezado("Lista de Pedidos");
+    Producto productoLinea;
 
     if (pedidoService.getPedidos().isEmpty()) {
       Console.imprimirFinProceso("No hay pedidos registrados.");
@@ -80,15 +85,18 @@ public class PedidoManager {
 
     for (Pedido pedido : pedidoService.getPedidos()) {
       Console.imprimirSeparador();
-      Console.coutln("\nPedido ID: " + pedido.getId());
+      Console.coutln("Pedido ID: " + pedido.getId());
       float total = 0f;
 
       for (LineaPedido linea : pedido.getLineas()) {
-        float subtotal = linea.getProducto().getPrecio() * linea.getCantidad();
+        productoLinea = prodService.buscarPorId(linea.getProductoId());
+        float subtotal = productoLinea.getPrecio() * linea.getCantidad();
         total += subtotal;
-        Console.coutln("  - " + linea.getProducto().getNombre() + " | Cantidad: " + linea.getCantidad()
+
+        Console.coutln("  - " + productoLinea.getNombre() + " | Cantidad: " + linea.getCantidad()
             + " | Subtotal: $" + subtotal);
       }
+
       Console.coutln("  Total: $" + total);
       Console.imprimirSeparador();
     }
@@ -98,15 +106,12 @@ public class PedidoManager {
 
   private List<SeleccionLinea> seleccionarLineas() {
     List<SeleccionLinea> lineas = new ArrayList<>();
-
-    Console.coutln("\nProductos disponibles:");
+    Console.coutln("Productos disponibles:");
 
     prodService.getProductos().forEach(p -> Console.coutln(p.toString()));
 
     boolean seguir = true;
     while (seguir) {
-      Console.cout("Ingrese el ID o nombre del producto a agregar: ");
-
       try {
         Producto producto = buscarProducto();
         int cantidad = solicitarCantidadParaProducto(producto);
@@ -117,25 +122,22 @@ public class PedidoManager {
         continue;
       }
 
-      Console.cout("¿Desea agregar otro producto al pedido? (s/n): ");
-      String resp = scanner.nextLine();
-
-      if (!resp.equalsIgnoreCase("s"))
-        seguir = false;
+      seguir = Console.confirmar("¿Desea agregar otro producto al pedido?");
     }
 
     return lineas;
   }
 
   private Producto buscarProducto() {
+    Console.cout("Ingrese el ID o nombre del producto a agregar: ");
     Producto producto = null;
     String input = scanner.nextLine();
 
     try {
       int id = Integer.parseInt(input);
-      producto = prodService.buscarPorId(id).orElse(null);
+      producto = prodService.buscarPorId(id);
     } catch (NumberFormatException _) {
-      producto = prodService.buscarPorNombre(input).orElse(null);
+      producto = prodService.buscarPorNombre(input);
     }
 
     if (producto == null)

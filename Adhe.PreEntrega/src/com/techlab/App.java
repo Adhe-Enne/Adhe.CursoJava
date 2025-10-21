@@ -18,7 +18,6 @@ public class App {
             Console.imprimirSeparador();
             mostrarMenu();
             opcion = scanner.nextInt();
-            scanner.nextLine();
             Console.imprimirSeparador();
             Console.limpiarPantalla();
 

@@ -20,16 +20,40 @@ public class ProductoManager {
   }
 
   public void agregarProducto() {
+    while (true) {
+      crearProducto();
+      if (!Console.confirmar("¿Desea agregar otro producto? (s/n): "))
+        break;
+    }
+
+    Console.esperarEnter();
+  }
+
+  public void crearProducto() {
     Console.imprimirEncabezado("Agregar Producto");
 
     Console.cout("Nombre: ");
     String nombre = scanner.nextLine();
+
+    while (true) {
+      if (nombre.isBlank())
+        Console.coutln("El nombre no puede estar vacío. Ingrese un nombre válido.");
+      else if (prodService.existeProducto(nombre))
+        Console.coutln("Ya existe un producto con ese nombre. Ingrese un nombre diferente.");
+      else if (!nombre.matches("^[a-zA-Z].*"))
+        Console.coutln("El nombre debe iniciar con una letra. Ingrese un nombre válido.");
+      else
+        break;
+
+      Console.cout("Nombre: ");
+      nombre = scanner.nextLine();
+    }
+
     float precio = solicitarPrecio();
     int stock = solicitarStock();
 
     Producto p = prodService.agregarProducto(nombre, precio, stock);
     Console.imprimirEncabezado("Producto agregado: " + p);
-    Console.esperarEnter();
   }
 
   public void listarProductos() {
@@ -63,10 +87,7 @@ public class ProductoManager {
       int nuevoStock = solicitarNuevoStock(producto.getStock());
       producto.setStock(nuevoStock);
 
-      Console.cout("¿Desea cambiar el nombre del producto? (s/n): ");
-      String cambiarNombre = scanner.nextLine();
-
-      if (cambiarNombre.equalsIgnoreCase("s"))
+      if (Console.confirmar("¿Desea cambiar el nombre del producto? (s/n): "))
         producto.setNombre(solicitarNuevoNombre(producto.getNombre()));
 
       Console.imprimirSeparador();
@@ -87,11 +108,8 @@ public class ProductoManager {
       Producto producto = buscarProducto();
 
       Console.imprimirEncabezado("Producto encontrado: " + producto);
-      Console.cout("¿Está seguro que desea eliminar este producto? (s/n): ");
 
-      String resp = scanner.nextLine();
-
-      if (!resp.equalsIgnoreCase("s")) {
+      if (!Console.confirmar("¿Está seguro que desea eliminar este producto?")) {
         Console.imprimirFinProceso("No se realizó ninguna acción.");
         return;
       }
@@ -114,9 +132,9 @@ public class ProductoManager {
 
     try {
       int id = Integer.parseInt(input);
-      producto = prodService.buscarPorId(id).orElse(null);
+      producto = prodService.buscarPorId(id);
     } catch (NumberFormatException _) {
-      producto = prodService.buscarPorNombre(input).orElse(null);
+      producto = prodService.buscarPorNombre(input);
     }
 
     if (producto == null)
@@ -126,9 +144,7 @@ public class ProductoManager {
   }
 
   private boolean confirmarActualizacion() {
-    Console.cout("¿Desea actualizar este producto? (s/n): ");
-    String resp = scanner.nextLine();
-    return resp.equalsIgnoreCase("s");
+    return Console.confirmar("¿Desea actualizar este producto? (s/n): ");
   }
 
   private float solicitarPrecio() {
@@ -143,7 +159,7 @@ public class ProductoManager {
         if (precio > 0)
           break;
 
-        Console.coutln("El precio no puede ser negativo.");
+        Console.coutln("El precio debe ser positivo.");
       } catch (NumberFormatException _) {
         Console.coutln("Ingrese un valor numérico válido para el precio.");
       }
@@ -238,7 +254,7 @@ public class ProductoManager {
         Console.coutln("El nombre no puede estar vacío.");
       else if (nombre.equalsIgnoreCase(nombreActual)) {
         Console.coutln("El nombre es igual al actual. Ingrese un nombre diferente.");
-      } else if (prodService.buscarPorNombre(nombre).isPresent())
+      } else if (prodService.existeProducto(nombre))
         Console.coutln("Ya existe un producto con ese nombre. Ingrese un nombre diferente.");
       else
         break;

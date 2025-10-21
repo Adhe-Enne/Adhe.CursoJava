@@ -2,6 +2,8 @@
 package com.techlab.managers;
 
 import com.techlab.services.ProductoService;
+import com.techlab.pedidos.LineaPedido;
+import com.techlab.pedidos.Pedido;
 import com.techlab.services.PedidoService;
 import java.util.Scanner;
 
@@ -49,6 +51,7 @@ public class BusinessManager {
     pedidoManager.listarPedidos();
   }
 
+  // Metodo de test para validar funcionalidades con datos precargados
   private void precargarProductos() {
     productoManager.agregarProducto("Café Premium", 1500.5f, 10);
     productoManager.agregarProducto("Té Verde", 1200.0f, 20);
@@ -58,5 +61,9 @@ public class BusinessManager {
     productoManager.agregarProducto("Galletas", 600.0f, 40);
     productoManager.agregarProducto("Mermelada", 1100.0f, 12);
     productoManager.agregarProducto("Pan Integral", 700.0f, 18);
+    int lineaId = 1;
+    Pedido pedido = pedidoManager.agregarPedido();
+    pedido.agregarLinea(new LineaPedido(1, 10, lineaId, pedido.getId()));
+    pedido.agregarLinea(new LineaPedido(3, 5, ++lineaId, pedido.getId()));
   }
 }
