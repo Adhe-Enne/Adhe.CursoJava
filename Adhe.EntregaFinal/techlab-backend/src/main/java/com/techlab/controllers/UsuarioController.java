@@ -1,6 +1,9 @@
 package com.techlab.controllers;
 
 import com.techlab.contracts.Result;
+import com.techlab.contracts.DtoMapper;
+import com.techlab.contracts.dtos.UsuarioRequest;
+import com.techlab.contracts.dtos.UsuarioResponse;
 import com.techlab.models.usuarios.Usuario;
 import com.techlab.services.IUsuarioService;
 
@@ -23,10 +26,12 @@ public class UsuarioController {
   }
 
   @PostMapping
-  public ResponseEntity<Result<Usuario>> crearUsuario(@Valid @RequestBody Usuario usuario) {
+  public ResponseEntity<Result<UsuarioResponse>> crearUsuario(@Valid @RequestBody UsuarioRequest usuarioReq) {
     try {
-      Usuario creado = usuarioService.crearUsuario(usuario);
-      return ResponseEntity.status(HttpStatus.CREATED).body(Result.success("Usuario creado exitosamente", creado));
+      Usuario u = DtoMapper.fromRequest(usuarioReq);
+      Usuario creado = usuarioService.crearUsuario(u);
+      return ResponseEntity.status(HttpStatus.CREATED)
+          .body(Result.success("Usuario creado exitosamente", DtoMapper.toDto(creado)));
     } catch (Exception e) {
       return ResponseEntity.status(HttpStatus.BAD_REQUEST)
           .body(Result.failure("Error al crear usuario: " + e.getMessage()));
@@ -34,10 +39,11 @@ public class UsuarioController {
   }
 
   @GetMapping
-  public ResponseEntity<Result<List<Usuario>>> listarUsuarios() {
+  public ResponseEntity<Result<java.util.List<UsuarioResponse>>> listarUsuarios() {
     try {
-      List<Usuario> usuarios = usuarioService.listarUsuarios();
-      return ResponseEntity.ok(Result.success(usuarios));
+      java.util.List<Usuario> usuarios = usuarioService.listarUsuarios();
+      java.util.List<UsuarioResponse> resp = usuarios.stream().map(DtoMapper::toDto).toList();
+      return ResponseEntity.ok(Result.success(resp));
     } catch (Exception e) {
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
           .body(Result.failure("Error al listar usuarios: " + e.getMessage()));
@@ -45,10 +51,10 @@ public class UsuarioController {
   }
 
   @GetMapping("/{id}")
-  public ResponseEntity<Result<Usuario>> obtenerUsuario(@PathVariable Long id) {
+  public ResponseEntity<Result<UsuarioResponse>> obtenerUsuario(@PathVariable Long id) {
     try {
       Usuario usuario = usuarioService.obtenerUsuarioPorId(id);
-      return ResponseEntity.ok(Result.success(usuario));
+      return ResponseEntity.ok(Result.success(DtoMapper.toDto(usuario)));
     } catch (Exception e) {
       return ResponseEntity.status(HttpStatus.NOT_FOUND)
           .body(Result.failure("Usuario no encontrado: " + e.getMessage()));
@@ -56,10 +62,10 @@ public class UsuarioController {
   }
 
   @DeleteMapping("/{id}")
-  public ResponseEntity<Result<Usuario>> eliminarLogicamente(@PathVariable Long id) {
+  public ResponseEntity<Result<UsuarioResponse>> eliminarLogicamente(@PathVariable Long id) {
     try {
       Usuario usuario = usuarioService.eliminarLogicamente(id);
-      return ResponseEntity.ok(Result.success("Usuario eliminado lógicamente", usuario));
+      return ResponseEntity.ok(Result.success("Usuario eliminado lógicamente", DtoMapper.toDto(usuario)));
     } catch (Exception e) {
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
           .body(Result.failure("Error al eliminar usuario: " + e.getMessage()));

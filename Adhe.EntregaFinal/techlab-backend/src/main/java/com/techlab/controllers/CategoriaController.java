@@ -1,6 +1,8 @@
 package com.techlab.controllers;
 
 import com.techlab.contracts.Result;
+import com.techlab.contracts.DtoMapper;
+import com.techlab.contracts.dtos.CategoriaDto;
 import com.techlab.models.categorias.Categoria;
 import com.techlab.services.ICategoriaService;
 import jakarta.validation.Valid;
@@ -21,10 +23,11 @@ public class CategoriaController {
   }
 
   @GetMapping
-  public ResponseEntity<Result<List<Categoria>>> listar() {
+  public ResponseEntity<Result<java.util.List<CategoriaDto>>> listar() {
     try {
-      List<Categoria> categorias = categoriaService.listarCategorias();
-      return ResponseEntity.ok(Result.success(categorias));
+      java.util.List<Categoria> categorias = categoriaService.listarCategorias();
+      java.util.List<CategoriaDto> dtos = categorias.stream().map(DtoMapper::toDto).toList();
+      return ResponseEntity.ok(Result.success(dtos));
     } catch (Exception e) {
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
           .body(Result.failure("Error al listar categorías: " + e.getMessage()));
@@ -32,10 +35,12 @@ public class CategoriaController {
   }
 
   @PostMapping
-  public ResponseEntity<Result<Categoria>> crear(@Valid @RequestBody Categoria categoria) {
+  public ResponseEntity<Result<CategoriaDto>> crear(@Valid @RequestBody CategoriaDto categoriaDto) {
     try {
-      Categoria creado = categoriaService.crearCategoria(categoria);
-      return ResponseEntity.status(HttpStatus.CREATED).body(Result.success("Categoría creada exitosamente", creado));
+      Categoria c = DtoMapper.fromDto(categoriaDto);
+      Categoria creado = categoriaService.crearCategoria(c);
+      return ResponseEntity.status(HttpStatus.CREATED)
+          .body(Result.success("Categoría creada exitosamente", DtoMapper.toDto(creado)));
     } catch (Exception e) {
       return ResponseEntity.status(HttpStatus.BAD_REQUEST)
           .body(Result.failure("Error al crear categoría: " + e.getMessage()));
@@ -43,10 +48,10 @@ public class CategoriaController {
   }
 
   @GetMapping("/{id}")
-  public ResponseEntity<Result<Categoria>> obtener(@PathVariable Long id) {
+  public ResponseEntity<Result<CategoriaDto>> obtener(@PathVariable Long id) {
     try {
       Categoria c = categoriaService.obtenerCategoriaPorId(id);
-      return ResponseEntity.ok(Result.success(c));
+      return ResponseEntity.ok(Result.success(DtoMapper.toDto(c)));
     } catch (IllegalArgumentException e) {
       return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Result.failure(e.getMessage()));
     } catch (Exception e) {
@@ -56,10 +61,12 @@ public class CategoriaController {
   }
 
   @PutMapping("/{id}")
-  public ResponseEntity<Result<Categoria>> actualizar(@PathVariable Long id, @Valid @RequestBody Categoria categoria) {
+  public ResponseEntity<Result<CategoriaDto>> actualizar(@PathVariable Long id,
+      @Valid @RequestBody CategoriaDto categoriaDto) {
     try {
-      Categoria actualizado = categoriaService.actualizarCategoria(id, categoria);
-      return ResponseEntity.ok(Result.success("Categoría actualizada", actualizado));
+      Categoria c = DtoMapper.fromDto(categoriaDto);
+      Categoria actualizado = categoriaService.actualizarCategoria(id, c);
+      return ResponseEntity.ok(Result.success("Categoría actualizada", DtoMapper.toDto(actualizado)));
     } catch (IllegalArgumentException e) {
       return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Result.failure(e.getMessage()));
     } catch (Exception e) {

@@ -1,6 +1,8 @@
 package com.techlab.controllers;
 
 import com.techlab.contracts.Result;
+import com.techlab.contracts.DtoMapper;
+import com.techlab.contracts.dtos.ProductoDto;
 import com.techlab.models.productos.Producto;
 import com.techlab.services.IProductoService;
 import jakarta.validation.Valid;
@@ -21,10 +23,11 @@ public class ProductoController {
   }
 
   @GetMapping
-  public ResponseEntity<Result<List<Producto>>> listar() {
+  public ResponseEntity<Result<java.util.List<ProductoDto>>> listar() {
     try {
-      List<Producto> productos = productoService.listarProductos();
-      return ResponseEntity.ok(Result.success(productos));
+      java.util.List<Producto> productos = productoService.listarProductos();
+      java.util.List<ProductoDto> dtos = productos.stream().map(DtoMapper::toDto).toList();
+      return ResponseEntity.ok(Result.success(dtos));
     } catch (Exception e) {
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
           .body(Result.failure("Error al listar productos: " + e.getMessage()));
@@ -32,10 +35,12 @@ public class ProductoController {
   }
 
   @PostMapping
-  public ResponseEntity<Result<Producto>> crear(@Valid @RequestBody Producto producto) {
+  public ResponseEntity<Result<ProductoDto>> crear(@Valid @RequestBody ProductoDto productoDto) {
     try {
+      Producto producto = DtoMapper.fromDto(productoDto);
       Producto creado = productoService.crearProducto(producto);
-      return ResponseEntity.status(HttpStatus.CREATED).body(Result.success("Producto creado exitosamente", creado));
+      return ResponseEntity.status(HttpStatus.CREATED)
+          .body(Result.success("Producto creado exitosamente", DtoMapper.toDto(creado)));
     } catch (Exception e) {
       return ResponseEntity.status(HttpStatus.BAD_REQUEST)
           .body(Result.failure("Error al crear producto: " + e.getMessage()));
@@ -43,10 +48,10 @@ public class ProductoController {
   }
 
   @GetMapping("/{id}")
-  public ResponseEntity<Result<Producto>> obtener(@PathVariable Long id) {
+  public ResponseEntity<Result<ProductoDto>> obtener(@PathVariable Long id) {
     try {
       Producto producto = productoService.obtenerProductoPorId(id);
-      return ResponseEntity.ok(Result.success(producto));
+      return ResponseEntity.ok(Result.success(DtoMapper.toDto(producto)));
     } catch (Exception e) {
       return ResponseEntity.status(HttpStatus.NOT_FOUND)
           .body(Result.failure("Producto no encontrado: " + e.getMessage()));
@@ -54,10 +59,12 @@ public class ProductoController {
   }
 
   @PutMapping("/{id}")
-  public ResponseEntity<Result<Producto>> actualizar(@PathVariable Long id, @Valid @RequestBody Producto producto) {
+  public ResponseEntity<Result<ProductoDto>> actualizar(@PathVariable Long id,
+      @Valid @RequestBody ProductoDto productoDto) {
     try {
+      Producto producto = DtoMapper.fromDto(productoDto);
       Producto actualizado = productoService.actualizarProducto(id, producto);
-      return ResponseEntity.ok(Result.success("Producto actualizado exitosamente", actualizado));
+      return ResponseEntity.ok(Result.success("Producto actualizado exitosamente", DtoMapper.toDto(actualizado)));
     } catch (Exception e) {
       return ResponseEntity.status(HttpStatus.BAD_REQUEST)
           .body(Result.failure("Error al actualizar producto: " + e.getMessage()));

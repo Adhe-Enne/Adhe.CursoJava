@@ -2,6 +2,9 @@ package com.techlab.controllers;
 
 import com.techlab.contracts.AuthRequest;
 import com.techlab.contracts.Result;
+import com.techlab.contracts.DtoMapper;
+import com.techlab.contracts.dtos.UsuarioRequest;
+import com.techlab.contracts.dtos.UsuarioResponse;
 import com.techlab.models.usuarios.Usuario;
 import com.techlab.security.JwtUtil;
 import com.techlab.services.IUsuarioService;
@@ -47,10 +50,12 @@ public class AuthController {
   }
 
   @PostMapping("/register")
-  public ResponseEntity<Result<Usuario>> register(@Valid @RequestBody Usuario usuario) {
+  public ResponseEntity<Result<UsuarioResponse>> register(@Valid @RequestBody UsuarioRequest usuarioReq) {
     try {
-      Usuario created = usuarioService.crearUsuario(usuario);
-      return ResponseEntity.status(HttpStatus.CREATED).body(Result.success("Usuario registrado exitosamente", created));
+      Usuario u = DtoMapper.fromRequest(usuarioReq);
+      Usuario created = usuarioService.crearUsuario(u);
+      return ResponseEntity.status(HttpStatus.CREATED)
+          .body(Result.success("Usuario registrado exitosamente", DtoMapper.toDto(created)));
     } catch (Exception e) {
       return ResponseEntity.status(HttpStatus.BAD_REQUEST)
           .body(Result.failure("Error al registrar usuario: " + e.getMessage()));

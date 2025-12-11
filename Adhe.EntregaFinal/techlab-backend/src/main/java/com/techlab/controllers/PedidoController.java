@@ -1,6 +1,9 @@
 package com.techlab.controllers;
 
 import com.techlab.contracts.Result;
+import com.techlab.contracts.DtoMapper;
+import com.techlab.contracts.dtos.PedidoRequest;
+import com.techlab.contracts.dtos.PedidoResponse;
 import com.techlab.models.pedidos.Pedido;
 import com.techlab.services.IPedidoService;
 import org.springframework.http.HttpStatus;
@@ -21,10 +24,12 @@ public class PedidoController {
   }
 
   @PostMapping("/pedidos")
-  public ResponseEntity<Result<Pedido>> crearPedido(@RequestBody Pedido pedido) {
+  public ResponseEntity<Result<PedidoResponse>> crearPedido(@RequestBody PedidoRequest pedidoReq) {
     try {
+      Pedido pedido = DtoMapper.fromRequest(pedidoReq);
       Pedido creado = pedidoService.crearPedido(pedido);
-      return ResponseEntity.status(HttpStatus.CREATED).body(Result.success("Pedido creado exitosamente", creado));
+      return ResponseEntity.status(HttpStatus.CREATED)
+          .body(Result.success("Pedido creado exitosamente", DtoMapper.toDto(creado)));
     } catch (Exception e) {
       return ResponseEntity.status(HttpStatus.BAD_REQUEST)
           .body(Result.failure("Error al crear el pedido: " + e.getMessage()));
@@ -32,10 +37,11 @@ public class PedidoController {
   }
 
   @GetMapping("/usuarios/{id}/pedidos")
-  public ResponseEntity<Result<List<Pedido>>> listarPorUsuario(@PathVariable("id") Long usuarioId) {
+  public ResponseEntity<Result<java.util.List<PedidoResponse>>> listarPorUsuario(@PathVariable("id") Long usuarioId) {
     try {
-      List<Pedido> pedidos = pedidoService.listarPedidosPorUsuario(usuarioId);
-      return ResponseEntity.ok(Result.success(pedidos));
+      java.util.List<Pedido> pedidos = pedidoService.listarPedidosPorUsuario(usuarioId);
+      java.util.List<PedidoResponse> resp = pedidos.stream().map(DtoMapper::toDto).toList();
+      return ResponseEntity.ok(Result.success(resp));
     } catch (Exception e) {
       return ResponseEntity.status(HttpStatus.BAD_REQUEST)
           .body(Result.failure("Error al listar pedidos: " + e.getMessage()));
@@ -43,11 +49,12 @@ public class PedidoController {
   }
 
   @PutMapping("/pedidos/{id}/estado")
-  public ResponseEntity<Result<Pedido>> actualizarEstado(@PathVariable Long id, @RequestBody Map<String, String> body) {
+  public ResponseEntity<Result<PedidoResponse>> actualizarEstado(@PathVariable Long id,
+      @RequestBody java.util.Map<String, String> body) {
     try {
       String estado = body.get("estado");
       Pedido actualizado = pedidoService.actualizarEstadoPedido(id, estado);
-      return ResponseEntity.ok(Result.success("Estado actualizado exitosamente", actualizado));
+      return ResponseEntity.ok(Result.success("Estado actualizado exitosamente", DtoMapper.toDto(actualizado)));
     } catch (Exception e) {
       return ResponseEntity.status(HttpStatus.BAD_REQUEST)
           .body(Result.failure("Error al actualizar el estado: " + e.getMessage()));
