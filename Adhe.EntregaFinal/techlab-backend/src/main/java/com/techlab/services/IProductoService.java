@@ -14,4 +14,8 @@ public interface IProductoService {
   Producto actualizarProducto(Long id, Producto producto);
 
   void eliminarProducto(Long id);
+
+  java.util.List<Producto> buscarPorNombre(String nombre);
+
+  java.util.List<Producto> listarPorCategoria(Long categoriaId);
 }

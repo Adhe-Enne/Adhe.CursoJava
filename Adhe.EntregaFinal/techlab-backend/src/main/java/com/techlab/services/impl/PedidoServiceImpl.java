@@ -7,10 +7,10 @@ import com.techlab.repositories.PedidoRepository;
 import com.techlab.repositories.ProductoRepository;
 import com.techlab.services.IPedidoService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
+import com.techlab.excepciones.BadRequestException;
+import com.techlab.excepciones.ResourceNotFoundException;
 import com.techlab.excepciones.ProductoNoEncontradoException;
 import com.techlab.excepciones.StockInsuficienteException;
 
@@ -32,38 +32,16 @@ public class PedidoServiceImpl implements IPedidoService {
   @Override
   @Transactional
   public Pedido crearPedido(Pedido pedido) {
-    if (pedido.getFechaCreacion() == null) {
-      pedido.setFechaCreacion(LocalDateTime.now());
-    }
-
+    validatePedidoBasico(pedido);
     double total = 0.0;
-    if (pedido.getLineasPedido() != null) {
-      for (LineaPedido linea : pedido.getLineasPedido()) {
-        Producto producto = productoRepository.findById(linea.getProductoId())
-            .orElseThrow(() -> new ProductoNoEncontradoException("Producto no encontrado: " + linea.getProductoId()));
-
-        int cantidad = (linea.getCantidad() != null ? linea.getCantidad() : 0);
-        if (cantidad < 0) {
-          throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-              "Cantidad inválida para el producto: " + linea.getProductoId());
-        }
-
-        if (producto.getStock() == null || producto.getStock() < cantidad) {
-          throw new StockInsuficienteException("Stock insuficiente para producto: " + linea.getProductoId());
-        }
-
-        double subtotal = producto.getPrecio() * cantidad;
-        linea.setSubtotal(subtotal);
-        linea.setPedido(pedido);
-        total += subtotal;
-
-        // Descontar stock y persistir el cambio
-        producto.setStock(producto.getStock() - cantidad);
-        productoRepository.save(producto);
-      }
+    for (LineaPedido linea : pedido.getLineasPedido()) {
+      total += procesarLineaPedido(pedido, linea);
     }
-
     pedido.setTotal(total);
+    // Asegurar estado por defecto
+    if (pedido.getEstado() == null || pedido.getEstado().trim().isEmpty()) {
+      pedido.setEstado("PENDIENTE");
+    }
     return pedidoRepository.save(pedido);
   }
 
@@ -72,15 +50,74 @@ public class PedidoServiceImpl implements IPedidoService {
     return pedidoRepository.findByUsuarioId(usuarioId);
   }
 
+  @Override
   public List<Pedido> listarPedidos() {
     return pedidoRepository.findAll();
   }
 
   @Override
   public Pedido actualizarEstadoPedido(Long id, String estado) {
+    if (estado == null || estado.trim().isEmpty()) {
+      throw new BadRequestException("Estado inválido");
+    }
     Pedido p = pedidoRepository.findById(id)
-        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Pedido no encontrado: " + id));
-    p.setEstado(estado);
+        .orElseThrow(() -> new ResourceNotFoundException("Pedido no encontrado: " + id));
+    // Aquí podríamos validar transiciones de estado si es necesario
+    p.setEstado(estado.trim().toUpperCase());
     return pedidoRepository.save(p);
+  }
+
+  @Override
+  public void eliminarPedido(Long id) {
+    if (!pedidoRepository.existsById(id)) {
+      throw new ResourceNotFoundException("Pedido no encontrado: " + id);
+    }
+    pedidoRepository.deleteById(id);
+  }
+
+  private void validatePedidoBasico(Pedido pedido) {
+    if (pedido == null) {
+      throw new BadRequestException("Pedido no puede ser nulo");
+    }
+    if (pedido.getUsuarioId() == null) {
+      throw new BadRequestException("usuarioId es requerido");
+    }
+    if (pedido.getFechaCreacion() == null) {
+      pedido.setFechaCreacion(LocalDateTime.now());
+    }
+    if (pedido.getLineasPedido() == null || pedido.getLineasPedido().isEmpty()) {
+      throw new BadRequestException("El pedido debe contener al menos una línea");
+    }
+  }
+
+  private double procesarLineaPedido(Pedido pedido, LineaPedido linea) {
+    if (linea.getProductoId() == null) {
+      throw new BadRequestException("productoId es requerido en linea de pedido");
+    }
+    Producto producto = productoRepository.findById(linea.getProductoId())
+        .orElseThrow(() -> new ProductoNoEncontradoException("Producto no encontrado: " + linea.getProductoId()));
+
+    int cantidad = (linea.getCantidad() != null ? linea.getCantidad() : 0);
+    if (cantidad <= 0) {
+      throw new BadRequestException("Cantidad inválida para el producto: " + linea.getProductoId());
+    }
+
+    if (producto.getStock() == null || producto.getStock() < cantidad) {
+      throw new StockInsuficienteException("Stock insuficiente para producto: " + linea.getProductoId());
+    }
+
+    if (producto.getPrecio() == null || producto.getPrecio() <= 0) {
+      throw new BadRequestException("Precio inválido para producto: " + linea.getProductoId());
+    }
+
+    double subtotal = producto.getPrecio() * cantidad;
+    linea.setSubtotal(subtotal);
+    linea.setPedido(pedido);
+
+    // Descontar stock y persistir el cambio
+    producto.setStock(producto.getStock() - cantidad);
+    productoRepository.save(producto);
+
+    return subtotal;
   }
 }

@@ -8,5 +8,9 @@ public interface IPedidoService {
 
   List<Pedido> listarPedidosPorUsuario(Long usuarioId);
 
+  List<Pedido> listarPedidos();
+
   Pedido actualizarEstadoPedido(Long id, String estado);
+
+  void eliminarPedido(Long id);
 }

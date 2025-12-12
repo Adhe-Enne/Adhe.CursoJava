@@ -5,6 +5,9 @@ import com.techlab.repositories.CategoriaRepository;
 import com.techlab.repositories.ProductoRepository;
 import com.techlab.services.ICategoriaService;
 import org.springframework.stereotype.Service;
+import com.techlab.excepciones.BadRequestException;
+import com.techlab.excepciones.ConflictException;
+import com.techlab.excepciones.ResourceNotFoundException;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -28,13 +31,14 @@ public class CategoriaServiceImpl implements ICategoriaService {
   @Override
   @Transactional
   public Categoria crearCategoria(Categoria categoria) {
+    validateCategoria(categoria);
     return categoriaRepository.save(categoria);
   }
 
   @Override
   public Categoria obtenerCategoriaPorId(Long id) {
     return categoriaRepository.findById(id)
-        .orElseThrow(() -> new IllegalArgumentException("Categoría no encontrada: " + id));
+        .orElseThrow(() -> new ResourceNotFoundException("Categoría no encontrada: " + id));
   }
 
   @Override
@@ -53,8 +57,20 @@ public class CategoriaServiceImpl implements ICategoriaService {
     // Prevenir eliminación si hay productos asociados
     boolean tieneProductos = productoRepository.existsByCategoriaId(id);
     if (tieneProductos) {
-      throw new IllegalStateException("No se puede eliminar la categoría porque tiene productos asociados");
+      throw new ConflictException("No se puede eliminar la categoría porque tiene productos asociados");
     }
     categoriaRepository.deleteById(id);
+  }
+
+  private void validateCategoria(Categoria categoria) {
+    if (categoria == null)
+      throw new BadRequestException("Categoría no puede ser nula");
+    String nombre = categoria.getNombre() == null ? null : categoria.getNombre().trim();
+    if (nombre == null || nombre.length() < 2 || nombre.length() > 100) {
+      throw new BadRequestException("Nombre de categoría inválido (2-100 caracteres)");
+    }
+    if (categoria.getDescripcion() != null && categoria.getDescripcion().length() > 255) {
+      throw new BadRequestException("Descripción no puede exceder 255 caracteres");
+    }
   }
 }
