@@ -19,8 +19,11 @@ public class UsuarioDetails implements UserDetails {
 
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {
-    // Simple single-role default; adapt if you add roles later
-    return Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"));
+    String role = usuario.getRole();
+    if (role == null || role.isBlank()) {
+      throw new IllegalStateException("El usuario no tiene un rol asignado");
+    }
+    return Collections.singletonList(new SimpleGrantedAuthority(role));
   }
 
   @Override

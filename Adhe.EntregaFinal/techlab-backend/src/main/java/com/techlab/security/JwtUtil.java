@@ -7,6 +7,10 @@ import org.springframework.stereotype.Component;
 
 import java.security.Key;
 import java.util.Date;
+import java.util.List;
+import java.util.Collection;
+import java.util.stream.Collectors;
+import org.springframework.security.core.GrantedAuthority;
 
 @Component
 public class JwtUtil {
@@ -21,15 +25,27 @@ public class JwtUtil {
     this.expirationMillis = expirationMillis;
   }
 
-  public String generateToken(String username) {
+  /**
+   * Generate token including username and roles claims.
+   */
+  public String generateToken(String username, Collection<? extends GrantedAuthority> authorities) {
     Date now = new Date();
     Date expiry = new Date(now.getTime() + expirationMillis);
+    List<String> roles = authorities == null ? List.of()
+        : authorities.stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList());
+
     return Jwts.builder()
         .setSubject(username)
+        .claim("roles", roles)
         .setIssuedAt(now)
         .setExpiration(expiry)
         .signWith(key, SignatureAlgorithm.HS256)
         .compact();
+  }
+
+  // Backwards-compatible helper: generate token with no authorities
+  public String generateToken(String username) {
+    return generateToken(username, List.of());
   }
 
   public String getUsernameFromToken(String token) {
@@ -46,5 +62,15 @@ public class JwtUtil {
     } catch (JwtException | IllegalArgumentException ex) {
       return false;
     }
+  }
+
+  @SuppressWarnings("unchecked")
+  public List<String> getRolesFromToken(String token) {
+    Claims claims = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody();
+    Object rolesObj = claims.get("roles");
+    if (rolesObj instanceof List) {
+      return ((List<?>) rolesObj).stream().map(Object::toString).collect(Collectors.toList());
+    }
+    return List.of();
   }
 }

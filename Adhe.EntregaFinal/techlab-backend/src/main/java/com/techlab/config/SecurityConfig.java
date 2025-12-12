@@ -47,10 +47,13 @@ public class SecurityConfig {
         .csrf(csrf -> csrf.disable())
         .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .authorizeHttpRequests(auth -> auth
-            .requestMatchers("/api/auth/**", "/api/Auth/**", "/actuator/**").permitAll()
+            .requestMatchers("/api/auth/**", "/api/Auth/**", "/actuator/**",
+                "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html")
+            .permitAll()
             .requestMatchers(HttpMethod.POST, "/api/usuarios").permitAll()
-            .requestMatchers("/api/usuarios/**").hasRole("ADMIN")
-            .anyRequest().authenticated())
+            .requestMatchers(HttpMethod.GET, "/**").hasAnyRole("USER", "ADMIN") // GET allowed for both roles
+            .anyRequest().hasRole("ADMIN") // Other operations only for ADMIN
+        )
         .exceptionHandling(ex -> ex.authenticationEntryPoint(authenticationEntryPoint));
 
     // Re-enable the JWT filter to validate tokens in requests

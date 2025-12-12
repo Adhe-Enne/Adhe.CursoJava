@@ -13,10 +13,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
+
+import io.swagger.v3.oas.annotations.Operation;
 
 import jakarta.validation.Valid;
 
@@ -37,28 +38,22 @@ public class AuthController {
     this.usuarioService = usuarioService;
   }
 
+  @Operation(summary = "Authenticate user and generate JWT token")
   @PostMapping("/login")
   public ResponseEntity<Result<String>> login(@Valid @RequestBody AuthRequest req) {
-    try {
-      authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(req.getEmail(), req.getPassword()));
-      final UserDetails userDetails = userDetailsService.loadUserByUsername(req.getEmail());
-      final String token = jwtUtil.generateToken(userDetails.getUsername());
-      return ResponseEntity.ok(Result.success("Login exitoso", token));
-    } catch (AuthenticationException ex) {
-      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Result.failure("Credenciales inválidas"));
-    }
+    authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(req.getEmail(), req.getPassword()));
+    final UserDetails userDetails = userDetailsService.loadUserByUsername(req.getEmail());
+    // Include user's authorities (roles) in the generated token
+    final String token = jwtUtil.generateToken(userDetails.getUsername(), userDetails.getAuthorities());
+    return ResponseEntity.ok(Result.success("Login exitoso", token));
   }
 
+  @Operation(summary = "Register a new user")
   @PostMapping("/register")
   public ResponseEntity<Result<UsuarioResponse>> register(@Valid @RequestBody UsuarioRequest usuarioReq) {
-    try {
-      Usuario u = DtoMapper.fromRequest(usuarioReq);
-      Usuario created = usuarioService.crearUsuario(u);
-      return ResponseEntity.status(HttpStatus.CREATED)
-          .body(Result.success("Usuario registrado exitosamente", DtoMapper.toDto(created)));
-    } catch (Exception e) {
-      return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-          .body(Result.failure("Error al registrar usuario: " + e.getMessage()));
-    }
+    Usuario u = DtoMapper.fromRequest(usuarioReq);
+    Usuario created = usuarioService.crearUsuario(u);
+    return ResponseEntity.status(HttpStatus.CREATED)
+        .body(Result.success("Usuario registrado exitosamente", DtoMapper.toDto(created)));
   }
 }

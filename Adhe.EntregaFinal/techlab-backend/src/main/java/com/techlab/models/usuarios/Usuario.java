@@ -30,6 +30,9 @@ public class Usuario {
 
   private LocalDateTime deletedAt;
 
+  @Column(nullable = false)
+  private String role; // Stores the role of the user (e.g., ROLE_USER, ROLE_ADMIN)
+
   // Getters y setters
   public Long getId() {
     return id;
@@ -77,5 +80,13 @@ public class Usuario {
 
   public void setDeletedAt(LocalDateTime deletedAt) {
     this.deletedAt = deletedAt;
+  }
+
+  public String getRole() {
+    return role;
+  }
+
+  public void setRole(String role) {
+    this.role = role;
   }
 }
