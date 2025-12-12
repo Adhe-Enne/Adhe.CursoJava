@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
+  // Keys
   static String timestamp = "timestamp";
   static String status = "status";
   static String error = "error";
@@ -23,13 +24,17 @@ public class GlobalExceptionHandler {
   static String message = "message";
   static String path = "path";
 
+  // Values
+  static String badRequest = "Bad Request";
+  static String notFound = "Not Found";
+
   @ExceptionHandler(ProductoNoEncontradoException.class)
   public ResponseEntity<Map<String, Object>> handleProductoNotFound(ProductoNoEncontradoException ex,
       HttpServletRequest request) {
     Map<String, Object> body = new LinkedHashMap<>();
     body.put(timestamp, Instant.now().toString());
     body.put(status, HttpStatus.NOT_FOUND.value());
-    body.put(error, "Not Found");
+    body.put(error, notFound);
     body.put(message, ex.getMessage());
     body.put(path, request.getRequestURI());
     return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
@@ -41,7 +46,7 @@ public class GlobalExceptionHandler {
     Map<String, Object> body = new LinkedHashMap<>();
     body.put(timestamp, Instant.now().toString());
     body.put(status, HttpStatus.BAD_REQUEST.value());
-    body.put(error, "Bad Request");
+    body.put(error, badRequest);
     body.put(message, ex.getMessage());
     body.put(path, request.getRequestURI());
     return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
@@ -59,11 +64,37 @@ public class GlobalExceptionHandler {
     Map<String, Object> body = new LinkedHashMap<>();
     body.put(timestamp, Instant.now().toString());
     body.put(status, HttpStatus.BAD_REQUEST.value());
-    body.put(error, "Bad Request");
+    body.put(error, badRequest);
     body.put(message, "Validation failed");
     body.put(errors, errorsResult);
     body.put(path, request.getRequestURI());
     return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
+  }
+
+  @ExceptionHandler(org.springframework.security.core.AuthenticationException.class)
+  public ResponseEntity<Map<String, Object>> handleAuthentication(
+      org.springframework.security.core.AuthenticationException ex,
+      HttpServletRequest request) {
+    Map<String, Object> body = new LinkedHashMap<>();
+    body.put(timestamp, Instant.now().toString());
+    body.put(status, HttpStatus.UNAUTHORIZED.value());
+    body.put(error, "Unauthorized");
+    body.put(message, ex.getMessage());
+    body.put(path, request.getRequestURI());
+    return new ResponseEntity<>(body, HttpStatus.UNAUTHORIZED);
+  }
+
+  @ExceptionHandler(com.techlab.excepciones.ResourceNotFoundException.class)
+  public ResponseEntity<Map<String, Object>> handleResourceNotFound(
+      com.techlab.excepciones.ResourceNotFoundException ex,
+      HttpServletRequest request) {
+    Map<String, Object> body = new LinkedHashMap<>();
+    body.put(timestamp, Instant.now().toString());
+    body.put(status, HttpStatus.NOT_FOUND.value());
+    body.put(error, notFound);
+    body.put(message, ex.getMessage());
+    body.put(path, request.getRequestURI());
+    return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
   }
 
   @ExceptionHandler(Exception.class)
@@ -75,5 +106,29 @@ public class GlobalExceptionHandler {
     body.put(message, "Unexpected error");
     body.put(path, request.getRequestURI());
     return new ResponseEntity<>(body, HttpStatus.INTERNAL_SERVER_ERROR);
+  }
+
+  @ExceptionHandler(com.techlab.excepciones.BadRequestException.class)
+  public ResponseEntity<Map<String, Object>> handleBadRequest(com.techlab.excepciones.BadRequestException ex,
+      HttpServletRequest request) {
+    Map<String, Object> body = new LinkedHashMap<>();
+    body.put(timestamp, Instant.now().toString());
+    body.put(status, HttpStatus.BAD_REQUEST.value());
+    body.put(error, "Bad Request");
+    body.put(message, ex.getMessage());
+    body.put(path, request.getRequestURI());
+    return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
+  }
+
+  @ExceptionHandler(com.techlab.excepciones.ConflictException.class)
+  public ResponseEntity<Map<String, Object>> handleConflict(com.techlab.excepciones.ConflictException ex,
+      HttpServletRequest request) {
+    Map<String, Object> body = new LinkedHashMap<>();
+    body.put(timestamp, Instant.now().toString());
+    body.put(status, HttpStatus.CONFLICT.value());
+    body.put(error, "Conflict");
+    body.put(message, ex.getMessage());
+    body.put(path, request.getRequestURI());
+    return new ResponseEntity<>(body, HttpStatus.CONFLICT);
   }
 }

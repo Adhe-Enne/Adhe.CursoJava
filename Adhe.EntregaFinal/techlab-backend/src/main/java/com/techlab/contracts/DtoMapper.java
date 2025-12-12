@@ -8,9 +8,12 @@ import com.techlab.models.pedidos.LineaPedido;
 import com.techlab.models.pedidos.Pedido;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class DtoMapper {
+
+  private DtoMapper() {
+    // util class
+  }
 
   // Producto
   public static ProductoDto toDto(Producto p) {
@@ -32,12 +35,12 @@ public class DtoMapper {
       return null;
     Producto p = new Producto();
     p.setId(dto.getId());
-    p.setNombre(dto.getNombre());
-    p.setDescripcion(dto.getDescripcion());
+    p.setNombre(dto.getNombre() == null ? null : dto.getNombre().trim());
+    p.setDescripcion(dto.getDescripcion() == null ? null : dto.getDescripcion().trim());
     p.setPrecio(dto.getPrecio());
     p.setStock(dto.getStock());
     p.setCategoriaId(dto.getCategoriaId());
-    p.setImagenUrl(dto.getImagenUrl());
+    p.setImagenUrl(dto.getImagenUrl() == null ? null : dto.getImagenUrl().trim());
     return p;
   }
 
@@ -58,8 +61,8 @@ public class DtoMapper {
       return null;
     Categoria c = new Categoria();
     c.setId(dto.getId());
-    c.setNombre(dto.getNombre());
-    c.setDescripcion(dto.getDescripcion());
+    c.setNombre(dto.getNombre() == null ? null : dto.getNombre().trim());
+    c.setDescripcion(dto.getDescripcion() == null ? null : dto.getDescripcion().trim());
     c.setActivo(dto.isActivo());
     return c;
   }
@@ -81,8 +84,8 @@ public class DtoMapper {
     if (req == null)
       return null;
     Usuario u = new Usuario();
-    u.setNombre(req.getNombre());
-    u.setEmail(req.getEmail());
+    u.setNombre(req.getNombre() == null ? null : req.getNombre().trim());
+    u.setEmail(req.getEmail() == null ? null : req.getEmail().trim());
     u.setPassword(req.getPassword());
     return u;
   }
@@ -118,8 +121,7 @@ public class DtoMapper {
     r.setFechaCreacion(p.getFechaCreacion());
     r.setTotal(p.getTotal());
     List<LineaPedidoResponse> lps = p.getLineasPedido() == null ? null
-        : p.getLineasPedido().stream()
-            .map(DtoMapper::toDto).collect(Collectors.toList());
+        : p.getLineasPedido().stream().map(DtoMapper::toDto).toList();
     r.setLineasPedido(lps);
     return r;
   }
@@ -130,7 +132,7 @@ public class DtoMapper {
     Pedido p = new Pedido();
     p.setUsuarioId(req.getUsuarioId());
     if (req.getItemsPedido() != null) {
-      List<LineaPedido> lps = req.getItemsPedido().stream().map(DtoMapper::fromRequest).collect(Collectors.toList());
+      List<LineaPedido> lps = req.getItemsPedido().stream().map(DtoMapper::fromRequest).toList();
       lps.forEach(lp -> lp.setPedido(p));
       p.setLineasPedido(lps);
     }

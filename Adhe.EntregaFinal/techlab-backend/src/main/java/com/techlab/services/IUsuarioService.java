@@ -14,4 +14,10 @@ public interface IUsuarioService {
   Usuario eliminarLogicamente(Long id);
 
   void eliminarFisicamente(Long id);
+
+  Usuario actualizarUsuario(Long id, Usuario usuario);
+
+  Usuario buscarPorEmail(String email);
+
+  Usuario cambiarRolUsuario(Long id, String nuevoRol);
 }
