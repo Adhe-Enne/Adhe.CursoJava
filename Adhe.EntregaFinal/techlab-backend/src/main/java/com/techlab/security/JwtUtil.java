@@ -9,11 +9,14 @@ import java.security.Key;
 import java.util.Date;
 import java.util.List;
 import java.util.Collection;
-import java.util.stream.Collectors;
 import org.springframework.security.core.GrantedAuthority;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Component
 public class JwtUtil {
+
+  private static final Logger logger = LoggerFactory.getLogger(JwtUtil.class);
 
   private final Key key;
   private final long expirationMillis;
@@ -29,10 +32,11 @@ public class JwtUtil {
    * Generate token including username and roles claims.
    */
   public String generateToken(String username, Collection<? extends GrantedAuthority> authorities) {
+    logger.info("Generating JWT token for user: {}", username);
     Date now = new Date();
     Date expiry = new Date(now.getTime() + expirationMillis);
     List<String> roles = authorities == null ? List.of()
-        : authorities.stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList());
+        : authorities.stream().map(GrantedAuthority::getAuthority).toList();
 
     return Jwts.builder()
         .setSubject(username)
@@ -58,19 +62,23 @@ public class JwtUtil {
   public boolean validateToken(String token) {
     try {
       Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
+      logger.info("JWT token validated successfully");
       return true;
-    } catch (JwtException | IllegalArgumentException ex) {
+    } catch (JwtException | IllegalArgumentException e) {
+      logger.warn("Invalid JWT token: {}", e.getMessage());
       return false;
     }
   }
 
-  @SuppressWarnings("unchecked")
   public List<String> getRolesFromToken(String token) {
     Claims claims = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody();
     Object rolesObj = claims.get("roles");
     if (rolesObj instanceof List) {
-      return ((List<?>) rolesObj).stream().map(Object::toString).collect(Collectors.toList());
+      return ((List<?>) rolesObj).stream().map(Object::toString).toList();
     }
     return List.of();
   }
+
+  // NOTE: Ensure the secret key is securely managed, e.g., via environment
+  // variables or a secrets manager.
 }

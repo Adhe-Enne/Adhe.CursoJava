@@ -11,7 +11,6 @@ import java.time.Instant;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
@@ -59,7 +58,7 @@ public class GlobalExceptionHandler {
         .getFieldErrors()
         .stream()
         .map(fe -> fe.getField() + ": " + fe.getDefaultMessage())
-        .collect(Collectors.toList());
+        .toList();
 
     Map<String, Object> body = new LinkedHashMap<>();
     body.put(timestamp, Instant.now().toString());

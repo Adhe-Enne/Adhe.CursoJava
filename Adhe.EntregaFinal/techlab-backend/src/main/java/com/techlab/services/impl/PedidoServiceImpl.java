@@ -5,6 +5,7 @@ import com.techlab.models.pedidos.Pedido;
 import com.techlab.models.productos.Producto;
 import com.techlab.repositories.PedidoRepository;
 import com.techlab.repositories.ProductoRepository;
+import com.techlab.repositories.UsuarioRepository;
 import com.techlab.services.IPedidoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,7 +15,6 @@ import com.techlab.excepciones.ResourceNotFoundException;
 import com.techlab.excepciones.ProductoNoEncontradoException;
 import com.techlab.excepciones.StockInsuficienteException;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -22,19 +22,35 @@ public class PedidoServiceImpl implements IPedidoService {
 
   private final PedidoRepository pedidoRepository;
   private final ProductoRepository productoRepository;
+  private final UsuarioRepository usuarioRepository;
 
   @Autowired
-  public PedidoServiceImpl(PedidoRepository pedidoRepository, ProductoRepository productoRepository) {
+  public PedidoServiceImpl(PedidoRepository pedidoRepository, ProductoRepository productoRepository,
+      UsuarioRepository usuarioRepository) {
     this.pedidoRepository = pedidoRepository;
     this.productoRepository = productoRepository;
+    this.usuarioRepository = usuarioRepository;
   }
 
   @Override
   @Transactional
   public Pedido crearPedido(Pedido pedido) {
-    validatePedidoBasico(pedido);
+    if (pedido.getUsuarioId() == null || pedido.getUsuarioId() <= 0) {
+      throw new BadRequestException("El ID de usuario no es válido.");
+    }
+    // Validate usuarioId existence (pseudo-code, replace with actual repository
+    // call)
+    if (!usuarioRepository.existsById(pedido.getUsuarioId())) {
+      throw new ResourceNotFoundException("El usuario con ID " + pedido.getUsuarioId() + " no existe.");
+    }
     double total = 0.0;
     for (LineaPedido linea : pedido.getLineasPedido()) {
+      if (linea.getProductoId() == null || linea.getProductoId() <= 0) {
+        throw new BadRequestException("El ID del producto en la línea de pedido no es válido.");
+      }
+      if (linea.getCantidad() == null || linea.getCantidad() <= 0) {
+        throw new BadRequestException("La cantidad en la línea de pedido debe ser mayor a 0.");
+      }
       total += procesarLineaPedido(pedido, linea);
     }
     pedido.setTotal(total);
@@ -73,21 +89,6 @@ public class PedidoServiceImpl implements IPedidoService {
       throw new ResourceNotFoundException("Pedido no encontrado: " + id);
     }
     pedidoRepository.deleteById(id);
-  }
-
-  private void validatePedidoBasico(Pedido pedido) {
-    if (pedido == null) {
-      throw new BadRequestException("Pedido no puede ser nulo");
-    }
-    if (pedido.getUsuarioId() == null) {
-      throw new BadRequestException("usuarioId es requerido");
-    }
-    if (pedido.getFechaCreacion() == null) {
-      pedido.setFechaCreacion(LocalDateTime.now());
-    }
-    if (pedido.getLineasPedido() == null || pedido.getLineasPedido().isEmpty()) {
-      throw new BadRequestException("El pedido debe contener al menos una línea");
-    }
   }
 
   private double procesarLineaPedido(Pedido pedido, LineaPedido linea) {

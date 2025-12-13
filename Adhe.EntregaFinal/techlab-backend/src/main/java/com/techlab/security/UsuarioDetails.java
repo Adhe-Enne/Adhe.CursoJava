@@ -8,10 +8,14 @@ import com.techlab.models.usuarios.Usuario;
 
 import java.util.Collection;
 import java.util.Collections;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class UsuarioDetails implements UserDetails {
 
-  private final Usuario usuario;
+  private static final Logger logger = LoggerFactory.getLogger(UsuarioDetails.class);
+
+  private final transient Usuario usuario;
 
   public UsuarioDetails(Usuario usuario) {
     this.usuario = usuario;
@@ -21,6 +25,7 @@ public class UsuarioDetails implements UserDetails {
   public Collection<? extends GrantedAuthority> getAuthorities() {
     String role = usuario.getRole();
     if (role == null || role.isBlank()) {
+      logger.error("El usuario {} no tiene un rol asignado", usuario.getEmail());
       throw new IllegalStateException("El usuario no tiene un rol asignado");
     }
     return Collections.singletonList(new SimpleGrantedAuthority(role));

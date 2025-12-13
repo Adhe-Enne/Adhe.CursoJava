@@ -4,6 +4,8 @@ import com.techlab.contracts.Result;
 import com.techlab.contracts.DtoMapper;
 import com.techlab.contracts.dtos.PedidoRequest;
 import com.techlab.contracts.dtos.PedidoResponse;
+import com.techlab.excepciones.BadRequestException;
+import com.techlab.excepciones.ResourceNotFoundException;
 import com.techlab.models.pedidos.Pedido;
 import com.techlab.services.IPedidoService;
 import org.springframework.http.HttpStatus;
@@ -35,7 +37,13 @@ public class PedidoController {
   @Operation(summary = "List orders by user ID")
   @GetMapping("/usuarios/{id}/pedidos")
   public ResponseEntity<Result<java.util.List<PedidoResponse>>> listarPorUsuario(@PathVariable("id") Long usuarioId) {
+    if (usuarioId == null || usuarioId <= 0) {
+      throw new BadRequestException("El ID de usuario no es válido.");
+    }
     java.util.List<Pedido> pedidos = pedidoService.listarPedidosPorUsuario(usuarioId);
+    if (pedidos.isEmpty()) {
+      throw new ResourceNotFoundException("No se encontraron pedidos para el usuario con ID: " + usuarioId);
+    }
     java.util.List<PedidoResponse> resp = pedidos.stream().map(DtoMapper::toDto).toList();
     return ResponseEntity.ok(Result.success(resp));
   }

@@ -12,9 +12,13 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
+
+  private static final Logger logJwtAuth = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
 
   private final JwtUtil jwtUtil;
   private final UsuarioDetailsService userDetailsService;
@@ -43,6 +47,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
       token = header.substring(7);
       if (jwtUtil.validateToken(token)) {
         username = jwtUtil.getUsernameFromToken(token);
+        logJwtAuth.info("JWT authentication successful for user: {}", username);
+      } else {
+        logJwtAuth.warn("JWT authentication failed: invalid or expired token");
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.getWriter().write("Token inválido o expirado");
+        return;
       }
     }
 

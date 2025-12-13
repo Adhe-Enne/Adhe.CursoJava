@@ -71,12 +71,13 @@ public class ProductoServiceImpl implements IProductoService {
       throw new BadRequestException("Stock inválido. No puede ser negativo");
     }
     if (producto.getCategoriaId() == null) {
-      throw new BadRequestException("categoriaId no puede ser nulo");
+      throw new BadRequestException("El ID de la categoría no puede ser nulo");
     }
-    // verificar que categoria exista
+
+    // Verificar que la categoría exista en la base de datos
     boolean exists = categoriaRepository.existsById(producto.getCategoriaId());
     if (!exists) {
-      throw new BadRequestException("Categoría no encontrada: " + producto.getCategoriaId());
+      throw new BadRequestException("La categoría con ID " + producto.getCategoriaId() + " no existe.");
     }
     if (producto.getImagenUrl() != null) {
       String url = producto.getImagenUrl().trim();

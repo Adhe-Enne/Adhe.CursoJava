@@ -72,5 +72,8 @@ public class CategoriaServiceImpl implements ICategoriaService {
     if (categoria.getDescripcion() != null && categoria.getDescripcion().length() > 255) {
       throw new BadRequestException("Descripción no puede exceder 255 caracteres");
     }
+    if (categoriaRepository.existsByNombre(categoria.getNombre())) {
+      throw new ConflictException("Ya existe una categoría con el nombre: " + categoria.getNombre());
+    }
   }
 }

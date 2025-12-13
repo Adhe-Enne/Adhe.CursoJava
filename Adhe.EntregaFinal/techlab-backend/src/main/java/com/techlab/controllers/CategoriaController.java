@@ -22,7 +22,7 @@ public class CategoriaController {
     this.categoriaService = categoriaService;
   }
 
-  @Operation(summary = "List all categories")
+  @Operation(summary = "List all categories", description = "Retrieve a list of all categories in the system.")
   @GetMapping
   public ResponseEntity<Result<java.util.List<CategoriaDto>>> listar() {
     java.util.List<Categoria> categorias = categoriaService.listarCategorias();
@@ -30,7 +30,7 @@ public class CategoriaController {
     return ResponseEntity.ok(Result.success(dtos));
   }
 
-  @Operation(summary = "Create a new category")
+  @Operation(summary = "Create a new category", description = "Create a new category by providing its details.")
   @PostMapping
   @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<Result<CategoriaDto>> crear(@Valid @RequestBody CategoriaDto categoriaDto) {
@@ -40,14 +40,14 @@ public class CategoriaController {
         .body(Result.success("Categoría creada exitosamente", DtoMapper.toDto(creado)));
   }
 
-  @Operation(summary = "Get a category by ID")
+  @Operation(summary = "Get a category by ID", description = "Retrieve a category by its unique ID.")
   @GetMapping("/{id}")
   public ResponseEntity<Result<CategoriaDto>> obtener(@PathVariable Long id) {
     Categoria c = categoriaService.obtenerCategoriaPorId(id);
     return ResponseEntity.ok(Result.success(DtoMapper.toDto(c)));
   }
 
-  @Operation(summary = "Update a category by ID")
+  @Operation(summary = "Update a category by ID", description = "Update the details of an existing category by its ID.")
   @PutMapping("/{id}")
   @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<Result<CategoriaDto>> actualizar(@PathVariable Long id,
@@ -57,7 +57,7 @@ public class CategoriaController {
     return ResponseEntity.ok(Result.success("Categoría actualizada", DtoMapper.toDto(actualizado)));
   }
 
-  @Operation(summary = "Delete a category by ID")
+  @Operation(summary = "Delete a category by ID", description = "Delete a category by its ID. Prevents deletion if products are associated.")
   @DeleteMapping("/{id}")
   @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<Result<Void>> eliminar(@PathVariable Long id) {
