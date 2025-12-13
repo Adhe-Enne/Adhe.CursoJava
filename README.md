@@ -12,17 +12,38 @@ Es una **aplicación de consola en Java**, desarrollada como práctica integrado
 
 ### 🧩 Descripción resumida
 
-- **Tipo:** Aplicación de consola  
-- **Lenguaje:** Java 21  
-- **IDE:** Visual Studio Code  
-- **Propósito:** Practicar conceptos de OOP, modularidad y diseño limpio  
-- **Estructura:** Dividida en *managers*, *services* y *modelos* para favorecer la separación de responsabilidades.  
-- **Calidad de código:** Validada con *SonarLint/SonarQube*.
+- **Tipo:** Aplicación de consola
+- **Lenguaje:** Java 21
+- **IDE:** Visual Studio Code
+- **Propósito:** Practicar conceptos de OOP, modularidad y diseño limpio
+- **Estructura:** Dividida en _managers_, _services_ y _modelos_ para favorecer la separación de responsabilidades.
+- **Calidad de código:** Validada con _SonarLint/SonarQube_.
 
 📘 Para más información técnica, estructura de carpetas y comandos de ejecución, consultá el README interno del proyecto:  
 ➡️ [`Adhe.PreEntrega/README.md`](./Adhe.PreEntrega/README.md)
 
+---
 
+## 📁 Proyecto `Adhe.EntregaFinal`
+
+La carpeta [`Adhe.EntregaFinal`](./Adhe.EntregaFinal/) contiene dos proyectos complementarios:
+
+1. **Backend:**
+
+   - **Framework:** Spring Boot.
+   - **Propósito:** Proveer una API RESTful para gestionar productos, usuarios y pedidos.
+   - **Detalles:** Incluye configuración de seguridad, controladores, servicios y repositorios.
+
+2. **Frontend:**
+   - **Framework:** React con TypeScript.
+   - **Propósito:** Consumir la API del backend y ofrecer una interfaz básica para registro, login y visualización de productos.
+   - **Detalles:** Implementación parcial con Redux para el estado global y Vite como herramienta de desarrollo.
+
+📘 Para más información técnica, consultá los README internos de cada proyecto:  
+➡️ [`Adhe.EntregaFinal/techlab-backend/README.md`](./Adhe.EntregaFinal/techlab-backend/README.md)  
+➡️ [`Adhe.EntregaFinal/techlab-frontend/README.md`](./Adhe.EntregaFinal/techlab-frontend/README.md)
+
+---
 
 #### 🧱 Estructura general del repositorio
 
@@ -39,4 +60,16 @@ Es una **aplicación de consola en Java**, desarrollada como práctica integrado
     ┃ ┃ ┣ ┣ ┣ 📂 utils/
     ┃ ┃ ┣ ┣ ┣ ☕ Ap.Java
     ┃ ┣ 📜 README.md
-    ┣ 📜 README.md ← (este archivo)
+    ┣ 📂 Adhe.EntregaFinal
+    ┃ ┣ 📂 techlab-backend/
+    ┃ ┃ ┣ 📂 src/
+    ┃ ┃ ┣ ┣ 📂 main/java/com/techlab/
+    ┃ ┃ ┣ ┣ 📂 test/java/com/techlab/
+    ┃ ┣ 📂 techlab-frontend/
+    ┃ ┃ ┣ 📂 src/
+    ┃ ┃ ┣ ┣ 📂 api/
+    ┃ ┃ ┣ ┣ 📂 features/
+    ┃ ┃ ┣ ┣ 📂 components/
+    ┃ ┃ ┣ ┣ 📂 pages/
+    ┃ ┣ 📜 README.md
+    ┣ 📜 README.md
