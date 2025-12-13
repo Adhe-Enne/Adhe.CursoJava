@@ -1,10 +1,16 @@
 package com.techlab.contracts.dtos;
 
+import java.time.LocalDateTime;
+
 public class LineaPedidoResponse {
   private Long id;
   private Long productoId;
   private Integer cantidad;
   private Double subtotal;
+
+  // Logical delete fields
+  private Boolean deleted;
+  private LocalDateTime deletedAt;
 
   public Long getId() {
     return id;
@@ -36,5 +42,21 @@ public class LineaPedidoResponse {
 
   public void setSubtotal(Double subtotal) {
     this.subtotal = subtotal;
+  }
+
+  public Boolean getDeleted() {
+    return deleted;
+  }
+
+  public void setDeleted(Boolean deleted) {
+    this.deleted = deleted;
+  }
+
+  public LocalDateTime getDeletedAt() {
+    return deletedAt;
+  }
+
+  public void setDeletedAt(LocalDateTime deletedAt) {
+    this.deletedAt = deletedAt;
   }
 }

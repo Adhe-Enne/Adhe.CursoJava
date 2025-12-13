@@ -1,6 +1,7 @@
 package com.techlab.contracts.dtos;
 
 import jakarta.validation.constraints.*;
+import java.time.LocalDateTime;
 
 public class CategoriaDto {
   private Long id;
@@ -13,6 +14,10 @@ public class CategoriaDto {
   private String descripcion;
 
   private boolean activo;
+
+  // Logical delete fields
+  private Boolean deleted;
+  private LocalDateTime deletedAt;
 
   public Long getId() {
     return id;
@@ -44,5 +49,21 @@ public class CategoriaDto {
 
   public void setActivo(boolean activo) {
     this.activo = activo;
+  }
+
+  public Boolean getDeleted() {
+    return deleted;
+  }
+
+  public void setDeleted(Boolean deleted) {
+    this.deleted = deleted;
+  }
+
+  public LocalDateTime getDeletedAt() {
+    return deletedAt;
+  }
+
+  public void setDeletedAt(LocalDateTime deletedAt) {
+    this.deletedAt = deletedAt;
   }
 }

@@ -27,6 +27,8 @@ public class DtoMapper {
     dto.setStock(p.getStock());
     dto.setCategoriaId(p.getCategoriaId());
     dto.setImagenUrl(p.getImagenUrl());
+    dto.setDeleted(p.getDeleted());
+    dto.setDeletedAt(p.getDeletedAt());
     return dto;
   }
 
@@ -41,6 +43,7 @@ public class DtoMapper {
     p.setStock(dto.getStock());
     p.setCategoriaId(dto.getCategoriaId());
     p.setImagenUrl(dto.getImagenUrl() == null ? null : dto.getImagenUrl().trim());
+    // server controls deleted fields; ignore any incoming value
     return p;
   }
 
@@ -53,6 +56,8 @@ public class DtoMapper {
     dto.setNombre(c.getNombre());
     dto.setDescripcion(c.getDescripcion());
     dto.setActivo(c.isActivo());
+    dto.setDeleted(c.getDeleted());
+    dto.setDeletedAt(c.getDeletedAt());
     return dto;
   }
 
@@ -64,6 +69,7 @@ public class DtoMapper {
     c.setNombre(dto.getNombre() == null ? null : dto.getNombre().trim());
     c.setDescripcion(dto.getDescripcion() == null ? null : dto.getDescripcion().trim());
     c.setActivo(dto.isActivo());
+    // server controls deleted fields; ignore dto.deleted
     return c;
   }
 
@@ -99,6 +105,8 @@ public class DtoMapper {
     r.setProductoId(lp.getProductoId());
     r.setCantidad(lp.getCantidad());
     r.setSubtotal(lp.getSubtotal());
+    r.setDeleted(lp.getDeleted());
+    r.setDeletedAt(lp.getDeletedAt());
     return r;
   }
 
@@ -123,6 +131,8 @@ public class DtoMapper {
     List<LineaPedidoResponse> lps = p.getLineasPedido() == null ? null
         : p.getLineasPedido().stream().map(DtoMapper::toDto).toList();
     r.setLineasPedido(lps);
+    r.setDeleted(p.getDeleted());
+    r.setDeletedAt(p.getDeletedAt());
     return r;
   }
 

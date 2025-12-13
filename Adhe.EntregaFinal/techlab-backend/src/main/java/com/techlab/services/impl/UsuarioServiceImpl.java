@@ -33,7 +33,7 @@ public class UsuarioServiceImpl implements IUsuarioService {
 
   @Override
   public List<Usuario> listarUsuarios() {
-    return usuarioRepository.findAll();
+    return usuarioRepository.findAllByDeletedFalse();
   }
 
   @Override

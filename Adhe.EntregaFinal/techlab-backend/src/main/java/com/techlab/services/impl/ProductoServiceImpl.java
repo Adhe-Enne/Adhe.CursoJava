@@ -26,12 +26,12 @@ public class ProductoServiceImpl implements IProductoService {
 
   @Override
   public List<Producto> listarProductos() {
-    return productoRepository.findAll();
+    return productoRepository.findAllByDeletedFalse();
   }
 
   @Override
   public Producto obtenerProductoPorId(Long id) {
-    return productoRepository.findById(id)
+    return productoRepository.findByIdAndDeletedFalse(id)
         .orElseThrow(() -> new ResourceNotFoundException("Producto no encontrado"));
   }
 
@@ -39,12 +39,14 @@ public class ProductoServiceImpl implements IProductoService {
   public Producto crearProducto(Producto producto) {
     validateProducto(producto);
     producto.setId(null);
+    producto.setDeleted(false);
+    producto.setDeletedAt(null);
     return productoRepository.save(producto);
   }
 
   @Override
   public Producto actualizarProducto(Long id, Producto producto) {
-    Producto existente = productoRepository.findById(id)
+    Producto existente = productoRepository.findByIdAndDeletedFalse(id)
         .orElseThrow(() -> new ResourceNotFoundException("Producto no encontrado"));
     validateProducto(producto);
     existente.setNombre(producto.getNombre());
@@ -94,6 +96,12 @@ public class ProductoServiceImpl implements IProductoService {
 
   @Override
   public void eliminarProducto(Long id) {
+    // backward compatible alias -> physical delete
+    eliminarFisicamente(id);
+  }
+
+  @Override
+  public void eliminarFisicamente(Long id) {
     if (!productoRepository.existsById(id)) {
       throw new ResourceNotFoundException("Producto no encontrado");
     }
@@ -101,11 +109,20 @@ public class ProductoServiceImpl implements IProductoService {
   }
 
   @Override
+  public Producto eliminarLogicamente(Long id) {
+    Producto p = productoRepository.findById(id)
+        .orElseThrow(() -> new ResourceNotFoundException("Producto no encontrado"));
+    p.setDeleted(true);
+    p.setDeletedAt(java.time.LocalDateTime.now());
+    return productoRepository.save(p);
+  }
+
+  @Override
   public java.util.List<Producto> buscarPorNombre(String nombre) {
     if (nombre == null || nombre.trim().isEmpty()) {
-      return productoRepository.findAll();
+      return productoRepository.findAllByDeletedFalse();
     }
-    return productoRepository.findByNombreContainingIgnoreCase(nombre.trim());
+    return productoRepository.findByNombreContainingIgnoreCaseAndDeletedFalse(nombre.trim());
   }
 
   @Override
@@ -113,6 +130,6 @@ public class ProductoServiceImpl implements IProductoService {
     if (categoriaId == null) {
       throw new BadRequestException("categoriaId es requerido");
     }
-    return productoRepository.findByCategoriaId(categoriaId);
+    return productoRepository.findByCategoriaIdAndDeletedFalse(categoriaId);
   }
 }

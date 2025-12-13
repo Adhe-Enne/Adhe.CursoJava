@@ -38,9 +38,8 @@ public class PedidoServiceImpl implements IPedidoService {
     if (pedido.getUsuarioId() == null || pedido.getUsuarioId() <= 0) {
       throw new BadRequestException("El ID de usuario no es válido.");
     }
-    // Validate usuarioId existence (pseudo-code, replace with actual repository
-    // call)
-    if (!usuarioRepository.existsById(pedido.getUsuarioId())) {
+    // Validate usuarioId existence and that user is not logically deleted
+    if (!usuarioRepository.findByIdAndDeletedFalse(pedido.getUsuarioId()).isPresent()) {
       throw new ResourceNotFoundException("El usuario con ID " + pedido.getUsuarioId() + " no existe.");
     }
     double total = 0.0;
@@ -58,17 +57,20 @@ public class PedidoServiceImpl implements IPedidoService {
     if (pedido.getEstado() == null || pedido.getEstado().trim().isEmpty()) {
       pedido.setEstado("PENDIENTE");
     }
+    // Ensure logical-delete defaults
+    pedido.setDeleted(false);
+    pedido.setDeletedAt(null);
     return pedidoRepository.save(pedido);
   }
 
   @Override
   public List<Pedido> listarPedidosPorUsuario(Long usuarioId) {
-    return pedidoRepository.findByUsuarioId(usuarioId);
+    return pedidoRepository.findByUsuarioIdAndDeletedFalse(usuarioId);
   }
 
   @Override
   public List<Pedido> listarPedidos() {
-    return pedidoRepository.findAll();
+    return pedidoRepository.findAllByDeletedFalse();
   }
 
   @Override
@@ -76,7 +78,7 @@ public class PedidoServiceImpl implements IPedidoService {
     if (estado == null || estado.trim().isEmpty()) {
       throw new BadRequestException("Estado inválido");
     }
-    Pedido p = pedidoRepository.findById(id)
+    Pedido p = pedidoRepository.findByIdAndDeletedFalse(id)
         .orElseThrow(() -> new ResourceNotFoundException("Pedido no encontrado: " + id));
     // Aquí podríamos validar transiciones de estado si es necesario
     p.setEstado(estado.trim().toUpperCase());
@@ -85,10 +87,25 @@ public class PedidoServiceImpl implements IPedidoService {
 
   @Override
   public void eliminarPedido(Long id) {
+    // Backwards-compatible alias -> physical
+    eliminarFisicamente(id);
+  }
+
+  @Override
+  public void eliminarFisicamente(Long id) {
     if (!pedidoRepository.existsById(id)) {
       throw new ResourceNotFoundException("Pedido no encontrado: " + id);
     }
     pedidoRepository.deleteById(id);
+  }
+
+  @Override
+  public Pedido eliminarLogicamente(Long id) {
+    Pedido p = pedidoRepository.findById(id)
+        .orElseThrow(() -> new ResourceNotFoundException("Pedido no encontrado: " + id));
+    p.setDeleted(true);
+    p.setDeletedAt(java.time.LocalDateTime.now());
+    return pedidoRepository.save(p);
   }
 
   private double procesarLineaPedido(Pedido pedido, LineaPedido linea) {

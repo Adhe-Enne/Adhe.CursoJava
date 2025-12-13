@@ -11,6 +11,10 @@ public class PedidoResponse {
   private Double total;
   private List<LineaPedidoResponse> lineasPedido;
 
+  // Logical delete fields
+  private Boolean deleted;
+  private LocalDateTime deletedAt;
+
   public Long getId() {
     return id;
   }
@@ -57,5 +61,21 @@ public class PedidoResponse {
 
   public void setLineasPedido(List<LineaPedidoResponse> lineasPedido) {
     this.lineasPedido = lineasPedido;
+  }
+
+  public Boolean getDeleted() {
+    return deleted;
+  }
+
+  public void setDeleted(Boolean deleted) {
+    this.deleted = deleted;
+  }
+
+  public LocalDateTime getDeletedAt() {
+    return deletedAt;
+  }
+
+  public void setDeletedAt(LocalDateTime deletedAt) {
+    this.deletedAt = deletedAt;
   }
 }

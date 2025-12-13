@@ -75,11 +75,19 @@ public class ProductoController {
     return ResponseEntity.ok(Result.success("Producto actualizado exitosamente", DtoMapper.toDto(actualizado)));
   }
 
-  @Operation(summary = "Delete a product by ID")
-  @DeleteMapping("/{id}")
+  @Operation(summary = "Physically delete a product by ID")
+  @DeleteMapping("/{id}/fisico")
   @PreAuthorize("hasRole('ADMIN')")
-  public ResponseEntity<Result<Void>> eliminar(@PathVariable Long id) {
-    productoService.eliminarProducto(id);
-    return ResponseEntity.ok(Result.success("Producto eliminado exitosamente", null));
+  public ResponseEntity<Result<Void>> eliminarFisico(@PathVariable Long id) {
+    productoService.eliminarFisicamente(id);
+    return ResponseEntity.ok(Result.success("Producto eliminado físicamente", null));
+  }
+
+  @Operation(summary = "Logically delete a product by ID (alternative)")
+  @DeleteMapping("/{id}/logico")
+  @PreAuthorize("hasRole('ADMIN')")
+  public ResponseEntity<Result<Void>> eliminarLogico(@PathVariable Long id) {
+    productoService.eliminarLogicamente(id);
+    return ResponseEntity.ok(Result.success("Producto eliminado lógicamente", null));
   }
 }

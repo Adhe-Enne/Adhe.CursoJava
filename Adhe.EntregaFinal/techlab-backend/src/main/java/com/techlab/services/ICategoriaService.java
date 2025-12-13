@@ -13,5 +13,14 @@ public interface ICategoriaService {
 
   Categoria actualizarCategoria(Long id, Categoria categoria);
 
-  void eliminarCategoria(Long id);
+  // Physical delete (permanent)
+  void eliminarFisicamente(Long id);
+
+  // Logical delete (soft) -> returns updated entity
+  Categoria eliminarLogicamente(Long id);
+
+  // Backwards compatible alias (previous name)
+  default void eliminarCategoria(Long id) {
+    eliminarFisicamente(id);
+  }
 }

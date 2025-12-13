@@ -13,7 +13,16 @@ public interface IProductoService {
 
   Producto actualizarProducto(Long id, Producto producto);
 
-  void eliminarProducto(Long id);
+  // Physical delete (permanent)
+  void eliminarFisicamente(Long id);
+
+  // Logical delete (soft) - returns updated entity
+  Producto eliminarLogicamente(Long id);
+
+  // Backwards compatible alias
+  default void eliminarProducto(Long id) {
+    eliminarFisicamente(id);
+  }
 
   java.util.List<Producto> buscarPorNombre(String nombre);
 

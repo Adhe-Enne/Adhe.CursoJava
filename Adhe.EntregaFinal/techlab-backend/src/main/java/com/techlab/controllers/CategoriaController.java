@@ -57,11 +57,19 @@ public class CategoriaController {
     return ResponseEntity.ok(Result.success("Categoría actualizada", DtoMapper.toDto(actualizado)));
   }
 
-  @Operation(summary = "Delete a category by ID", description = "Delete a category by its ID. Prevents deletion if products are associated.")
-  @DeleteMapping("/{id}")
+  @Operation(summary = "Physically delete a category by ID", description = "Permanent deletion of a category (physical).")
+  @DeleteMapping("/{id}/fisico")
   @PreAuthorize("hasRole('ADMIN')")
-  public ResponseEntity<Result<Void>> eliminar(@PathVariable Long id) {
-    categoriaService.eliminarCategoria(id);
-    return ResponseEntity.ok(Result.success("Categoría eliminada", null));
+  public ResponseEntity<Result<Void>> eliminarFisico(@PathVariable Long id) {
+    categoriaService.eliminarFisicamente(id);
+    return ResponseEntity.ok(Result.success("Categoría eliminada físicamente", null));
+  }
+
+  @Operation(summary = "Logically delete a category by ID (alternative)")
+  @DeleteMapping("/{id}/logico")
+  @PreAuthorize("hasRole('ADMIN')")
+  public ResponseEntity<Result<Void>> eliminarLogico(@PathVariable Long id) {
+    categoriaService.eliminarLogicamente(id);
+    return ResponseEntity.ok(Result.success("Categoría eliminada lógicamente", null));
   }
 }

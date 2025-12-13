@@ -1,6 +1,7 @@
 package com.techlab.contracts.dtos;
 
 import jakarta.validation.constraints.*;
+import java.time.LocalDateTime;
 
 public class ProductoDto {
 
@@ -26,6 +27,10 @@ public class ProductoDto {
 
   @Size(max = 255)
   private String imagenUrl;
+
+  // Logical delete fields
+  private Boolean deleted;
+  private LocalDateTime deletedAt;
 
   public Long getId() {
     return id;
@@ -81,5 +86,21 @@ public class ProductoDto {
 
   public void setImagenUrl(String imagenUrl) {
     this.imagenUrl = imagenUrl;
+  }
+
+  public Boolean getDeleted() {
+    return deleted;
+  }
+
+  public void setDeleted(Boolean deleted) {
+    this.deleted = deleted;
+  }
+
+  public LocalDateTime getDeletedAt() {
+    return deletedAt;
+  }
+
+  public void setDeletedAt(LocalDateTime deletedAt) {
+    this.deletedAt = deletedAt;
   }
 }

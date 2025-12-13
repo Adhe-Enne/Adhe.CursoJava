@@ -9,4 +9,11 @@ public interface CategoriaRepository extends JpaRepository<Categoria, Long> {
 
   boolean existsByNombre(String nombre);
 
+  // Logical-delete aware queries
+  java.util.Optional<Categoria> findByIdAndDeletedFalse(Long id);
+
+  java.util.List<Categoria> findAllByDeletedFalse();
+
+  boolean existsByNombreAndDeletedFalse(String nombre);
+
 }

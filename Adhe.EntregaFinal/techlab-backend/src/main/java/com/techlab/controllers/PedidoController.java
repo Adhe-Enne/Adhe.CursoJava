@@ -66,11 +66,19 @@ public class PedidoController {
     return ResponseEntity.ok(Result.success("Estado actualizado exitosamente", DtoMapper.toDto(actualizado)));
   }
 
-  @Operation(summary = "Delete an order")
-  @DeleteMapping("/pedidos/{id}")
+  @Operation(summary = "Physically delete an order")
+  @DeleteMapping("/pedidos/{id}/fisico")
   @PreAuthorize("hasRole('ADMIN')")
-  public ResponseEntity<Result<Void>> eliminarPedido(@PathVariable Long id) {
-    pedidoService.eliminarPedido(id);
-    return ResponseEntity.ok(Result.success("Pedido eliminado exitosamente", null));
+  public ResponseEntity<Result<Void>> eliminarPedidoFisico(@PathVariable Long id) {
+    pedidoService.eliminarFisicamente(id);
+    return ResponseEntity.ok(Result.success("Pedido eliminado físicamente", null));
+  }
+
+  @Operation(summary = "Logically delete an order (alternative)")
+  @DeleteMapping("/pedidos/{id}/logico")
+  @PreAuthorize("hasRole('ADMIN')")
+  public ResponseEntity<Result<Void>> eliminarPedidoLogico(@PathVariable Long id) {
+    pedidoService.eliminarLogicamente(id);
+    return ResponseEntity.ok(Result.success("Pedido eliminado lógicamente", null));
   }
 }

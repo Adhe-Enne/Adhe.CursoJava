@@ -12,4 +12,6 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
   Optional<Usuario> findByEmailAndDeletedFalse(String email);
 
   long countByRoleAndDeletedFalse(String role);
+
+  java.util.List<Usuario> findAllByDeletedFalse();
 }

@@ -12,5 +12,14 @@ public interface IPedidoService {
 
   Pedido actualizarEstadoPedido(Long id, String estado);
 
-  void eliminarPedido(Long id);
+  // Physical delete (permanent)
+  void eliminarFisicamente(Long id);
+
+  // Logical delete (soft)
+  Pedido eliminarLogicamente(Long id);
+
+  // Backwards compatible alias
+  default void eliminarPedido(Long id) {
+    eliminarFisicamente(id);
+  }
 }

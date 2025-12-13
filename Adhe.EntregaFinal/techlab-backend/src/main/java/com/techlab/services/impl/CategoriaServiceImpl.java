@@ -25,19 +25,22 @@ public class CategoriaServiceImpl implements ICategoriaService {
 
   @Override
   public List<Categoria> listarCategorias() {
-    return categoriaRepository.findAll();
+    return categoriaRepository.findAllByDeletedFalse();
   }
 
   @Override
   @Transactional
   public Categoria crearCategoria(Categoria categoria) {
     validateCategoria(categoria);
+    // Ensure logical-delete defaults
+    categoria.setDeleted(false);
+    categoria.setDeletedAt(null);
     return categoriaRepository.save(categoria);
   }
 
   @Override
   public Categoria obtenerCategoriaPorId(Long id) {
-    return categoriaRepository.findById(id)
+    return categoriaRepository.findByIdAndDeletedFalse(id)
         .orElseThrow(() -> new ResourceNotFoundException("Categoría no encontrada: " + id));
   }
 
@@ -54,12 +57,34 @@ public class CategoriaServiceImpl implements ICategoriaService {
   @Override
   @Transactional
   public void eliminarCategoria(Long id) {
+    // Keep backward compatibility: perform physical delete
+    eliminarFisicamente(id);
+  }
+
+  @Override
+  @Transactional
+  public void eliminarFisicamente(Long id) {
     // Prevenir eliminación si hay productos asociados
     boolean tieneProductos = productoRepository.existsByCategoriaId(id);
     if (tieneProductos) {
       throw new ConflictException("No se puede eliminar la categoría porque tiene productos asociados");
     }
     categoriaRepository.deleteById(id);
+  }
+
+  @Override
+  @Transactional
+  public Categoria eliminarLogicamente(Long id) {
+    Categoria c = categoriaRepository.findById(id)
+        .orElseThrow(() -> new ResourceNotFoundException("Categoría no encontrada: " + id));
+    // Prevent logical delete if there are products associated
+    boolean tieneProductos = productoRepository.existsByCategoriaId(id);
+    if (tieneProductos) {
+      throw new ConflictException("No se puede eliminar lógicamente la categoría porque tiene productos asociados");
+    }
+    c.setDeleted(true);
+    c.setDeletedAt(java.time.LocalDateTime.now());
+    return categoriaRepository.save(c);
   }
 
   private void validateCategoria(Categoria categoria) {
