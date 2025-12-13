@@ -31,6 +31,7 @@ public class ProductoDto {
   // Logical delete fields
   private Boolean deleted;
   private LocalDateTime deletedAt;
+  private LocalDateTime updatedAt;
 
   public Long getId() {
     return id;
@@ -102,5 +103,13 @@ public class ProductoDto {
 
   public void setDeletedAt(LocalDateTime deletedAt) {
     this.deletedAt = deletedAt;
+  }
+
+  public LocalDateTime getUpdatedAt() {
+    return updatedAt;
+  }
+
+  public void setUpdatedAt(LocalDateTime updatedAt) {
+    this.updatedAt = updatedAt;
   }
 }

@@ -29,6 +29,7 @@ public class DtoMapper {
     dto.setImagenUrl(p.getImagenUrl());
     dto.setDeleted(p.getDeleted());
     dto.setDeletedAt(p.getDeletedAt());
+    dto.setUpdatedAt(p.getUpdatedAt());
     return dto;
   }
 
@@ -58,6 +59,7 @@ public class DtoMapper {
     dto.setActivo(c.isActivo());
     dto.setDeleted(c.getDeleted());
     dto.setDeletedAt(c.getDeletedAt());
+    dto.setUpdatedAt(c.getUpdatedAt());
     return dto;
   }
 
@@ -83,6 +85,8 @@ public class DtoMapper {
     r.setEmail(u.getEmail());
     r.setDeleted(u.getDeleted());
     r.setDeletedAt(u.getDeletedAt());
+    r.setRole(u.getRole());
+    r.setUpdatedAt(u.getUpdatedAt());
     return r;
   }
 
@@ -93,6 +97,12 @@ public class DtoMapper {
     u.setNombre(req.getNombre() == null ? null : req.getNombre().trim());
     u.setEmail(req.getEmail() == null ? null : req.getEmail().trim());
     u.setPassword(req.getPassword());
+    // set role: if provided use it, otherwise default to USER (service normalizes)
+    if (req.getRole() != null && !req.getRole().trim().isEmpty()) {
+      u.setRole(req.getRole().trim());
+    } else {
+      u.setRole("USER");
+    }
     return u;
   }
 
@@ -107,6 +117,7 @@ public class DtoMapper {
     r.setSubtotal(lp.getSubtotal());
     r.setDeleted(lp.getDeleted());
     r.setDeletedAt(lp.getDeletedAt());
+    r.setUpdatedAt(lp.getUpdatedAt());
     return r;
   }
 
@@ -133,6 +144,7 @@ public class DtoMapper {
     r.setLineasPedido(lps);
     r.setDeleted(p.getDeleted());
     r.setDeletedAt(p.getDeletedAt());
+    r.setUpdatedAt(p.getUpdatedAt());
     return r;
   }
 

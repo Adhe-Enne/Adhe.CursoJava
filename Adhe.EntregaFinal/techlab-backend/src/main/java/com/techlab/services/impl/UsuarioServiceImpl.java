@@ -15,6 +15,10 @@ import com.techlab.security.Roles;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.regex.Pattern;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import java.util.Collection;
 
 @Service
 public class UsuarioServiceImpl implements IUsuarioService {
@@ -64,8 +68,18 @@ public class UsuarioServiceImpl implements IUsuarioService {
       throw new BadRequestException("Password inválido: mínimo 6 caracteres");
     }
 
-    if (!Roles.isValid(usuario.getRole())) {
-      throw new BadRequestException("Rol inválido: " + usuario.getRole());
+    // Normalize and validate role. Accept both 'ROLE_USER' and 'USER' formats.
+    if (usuario.getRole() == null || usuario.getRole().trim().isEmpty()) {
+      usuario.setRole(ROLE_USER);
+    } else {
+      String roleUpper = usuario.getRole().trim().toUpperCase();
+      if (roleUpper.startsWith("ROLE_")) {
+        roleUpper = roleUpper.substring(5);
+      }
+      if (!roleUpper.equals(ROLE_ADMIN) && !roleUpper.equals(ROLE_USER)) {
+        throw new BadRequestException("Rol inválido: " + usuario.getRole());
+      }
+      usuario.setRole(roleUpper);
     }
 
     usuario.setDeleted(false);
@@ -168,6 +182,58 @@ public class UsuarioServiceImpl implements IUsuarioService {
     }
 
     usuario.setRole(rolUpper);
+    return usuarioRepository.save(usuario);
+  }
+
+  @Override
+  public Usuario actualizarContrasena(Long id, String currentPassword, String newPassword) {
+    if (newPassword == null || newPassword.length() < 6) {
+      throw new BadRequestException("La nueva contraseña debe tener al menos 6 caracteres");
+    }
+
+    Usuario usuario = usuarioRepository.findByIdAndDeletedFalse(id)
+        .orElseThrow(() -> new com.techlab.excepciones.ResourceNotFoundException("Usuario no encontrado: " + id));
+
+    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+    String authName = auth == null ? null : auth.getName();
+    boolean isAdmin = false;
+    if (auth != null) {
+      Collection<? extends GrantedAuthority> authorities = auth.getAuthorities();
+      if (authorities != null) {
+        for (GrantedAuthority ga : authorities) {
+          if (ga.getAuthority() != null && ga.getAuthority().toUpperCase().contains("ADMIN")) {
+            isAdmin = true;
+            break;
+          }
+        }
+      }
+    }
+
+    // If caller is not admin, ensure they are changing their own password and
+    // provided current password
+    if (!isAdmin) {
+      if (authName == null || !authName.equals(usuario.getEmail())) {
+        throw new BadRequestException("No autorizado para cambiar la contraseña de este usuario");
+      }
+      if (currentPassword == null || !passwordEncoder.matches(currentPassword, usuario.getPassword())) {
+        throw new BadRequestException("Contraseña actual inválida");
+      }
+    }
+
+    usuario.setPassword(passwordEncoder.encode(newPassword));
+    usuario.setUpdatedAt(LocalDateTime.now());
+    return usuarioRepository.save(usuario);
+  }
+
+  @Override
+  public Usuario actualizarContrasenaPorAdmin(Long id, String newPassword) {
+    if (newPassword == null || newPassword.length() < 6) {
+      throw new BadRequestException("La nueva contraseña debe tener al menos 6 caracteres");
+    }
+    Usuario usuario = usuarioRepository.findByIdAndDeletedFalse(id)
+        .orElseThrow(() -> new com.techlab.excepciones.ResourceNotFoundException("Usuario no encontrado: " + id));
+    usuario.setPassword(passwordEncoder.encode(newPassword));
+    usuario.setUpdatedAt(LocalDateTime.now());
     return usuarioRepository.save(usuario);
   }
 }

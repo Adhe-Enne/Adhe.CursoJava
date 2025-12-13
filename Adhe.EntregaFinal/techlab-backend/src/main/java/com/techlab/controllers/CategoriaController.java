@@ -22,7 +22,7 @@ public class CategoriaController {
     this.categoriaService = categoriaService;
   }
 
-  @Operation(summary = "List all categories", description = "Retrieve a list of all categories in the system.")
+  @Operation(summary = "Listar todas las categorías", description = "Recupera la lista de todas las categorías del sistema.")
   @GetMapping
   public ResponseEntity<Result<java.util.List<CategoriaDto>>> listar() {
     java.util.List<Categoria> categorias = categoriaService.listarCategorias();
@@ -30,7 +30,7 @@ public class CategoriaController {
     return ResponseEntity.ok(Result.success(dtos));
   }
 
-  @Operation(summary = "Create a new category", description = "Create a new category by providing its details.")
+  @Operation(summary = "Crear una nueva categoría", description = "Crea una nueva categoría proporcionando sus datos.")
   @PostMapping
   @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<Result<CategoriaDto>> crear(@Valid @RequestBody CategoriaDto categoriaDto) {
@@ -40,14 +40,14 @@ public class CategoriaController {
         .body(Result.success("Categoría creada exitosamente", DtoMapper.toDto(creado)));
   }
 
-  @Operation(summary = "Get a category by ID", description = "Retrieve a category by its unique ID.")
+  @Operation(summary = "Obtener una categoría por ID", description = "Recupera una categoría por su ID único.")
   @GetMapping("/{id}")
   public ResponseEntity<Result<CategoriaDto>> obtener(@PathVariable Long id) {
     Categoria c = categoriaService.obtenerCategoriaPorId(id);
     return ResponseEntity.ok(Result.success(DtoMapper.toDto(c)));
   }
 
-  @Operation(summary = "Update a category by ID", description = "Update the details of an existing category by its ID.")
+  @Operation(summary = "Actualizar una categoría por ID", description = "Actualiza los datos de una categoría existente por su ID.")
   @PutMapping("/{id}")
   @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<Result<CategoriaDto>> actualizar(@PathVariable Long id,
@@ -57,7 +57,7 @@ public class CategoriaController {
     return ResponseEntity.ok(Result.success("Categoría actualizada", DtoMapper.toDto(actualizado)));
   }
 
-  @Operation(summary = "Physically delete a category by ID", description = "Permanent deletion of a category (physical).")
+  @Operation(summary = "Eliminar físicamente una categoría por ID", description = "Eliminación permanente de una categoría (física).")
   @DeleteMapping("/{id}/fisico")
   @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<Result<Void>> eliminarFisico(@PathVariable Long id) {
@@ -65,7 +65,7 @@ public class CategoriaController {
     return ResponseEntity.ok(Result.success("Categoría eliminada físicamente", null));
   }
 
-  @Operation(summary = "Logically delete a category by ID (alternative)")
+  @Operation(summary = "Eliminar lógicamente una categoría por ID (alternativo)")
   @DeleteMapping("/{id}/logico")
   @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<Result<Void>> eliminarLogico(@PathVariable Long id) {

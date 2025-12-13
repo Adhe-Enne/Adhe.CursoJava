@@ -17,6 +17,12 @@ public interface IUsuarioService {
 
   Usuario actualizarUsuario(Long id, Usuario usuario);
 
+  // Change password by user (requires current password unless caller is admin)
+  Usuario actualizarContrasena(Long id, String currentPassword, String newPassword);
+
+  // Admin override: change password without current password
+  Usuario actualizarContrasenaPorAdmin(Long id, String newPassword);
+
   Usuario buscarPorEmail(String email);
 
   Usuario cambiarRolUsuario(Long id, String nuevoRol);

@@ -16,6 +16,9 @@ public class UsuarioRequest {
   @Size(min = 6)
   private String password;
 
+  // Optional role (admin use). If not provided, server will set a default.
+  private String role;
+
   public String getNombre() {
     return nombre;
   }
@@ -38,5 +41,13 @@ public class UsuarioRequest {
 
   public void setPassword(String password) {
     this.password = password;
+  }
+
+  public String getRole() {
+    return role;
+  }
+
+  public void setRole(String role) {
+    this.role = role;
   }
 }

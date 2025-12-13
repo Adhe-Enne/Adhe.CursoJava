@@ -25,7 +25,7 @@ public class PedidoController {
     this.pedidoService = pedidoService;
   }
 
-  @Operation(summary = "Create a new order")
+  @Operation(summary = "Crear un nuevo pedido")
   @PostMapping("/pedidos")
   public ResponseEntity<Result<PedidoResponse>> crearPedido(@Valid @RequestBody PedidoRequest pedidoReq) {
     Pedido pedido = DtoMapper.fromRequest(pedidoReq);
@@ -34,7 +34,7 @@ public class PedidoController {
         .body(Result.success("Pedido creado exitosamente", DtoMapper.toDto(creado)));
   }
 
-  @Operation(summary = "List orders by user ID")
+  @Operation(summary = "Listar pedidos por ID de usuario")
   @GetMapping("/usuarios/{id}/pedidos")
   public ResponseEntity<Result<java.util.List<PedidoResponse>>> listarPorUsuario(@PathVariable("id") Long usuarioId) {
     if (usuarioId == null || usuarioId <= 0) {
@@ -48,7 +48,7 @@ public class PedidoController {
     return ResponseEntity.ok(Result.success(resp));
   }
 
-  @Operation(summary = "List all orders")
+  @Operation(summary = "Listar todos los pedidos")
   @GetMapping("/pedidos")
   public ResponseEntity<Result<java.util.List<PedidoResponse>>> listarPedidos() {
     java.util.List<Pedido> pedidos = pedidoService.listarPedidos();
@@ -56,7 +56,7 @@ public class PedidoController {
     return ResponseEntity.ok(Result.success(resp));
   }
 
-  @Operation(summary = "Update order status")
+  @Operation(summary = "Actualizar el estado de un pedido")
   @PutMapping("/pedidos/{id}/estado")
   @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<Result<PedidoResponse>> actualizarEstado(@PathVariable Long id,
@@ -66,7 +66,7 @@ public class PedidoController {
     return ResponseEntity.ok(Result.success("Estado actualizado exitosamente", DtoMapper.toDto(actualizado)));
   }
 
-  @Operation(summary = "Physically delete an order")
+  @Operation(summary = "Eliminar físicamente un pedido")
   @DeleteMapping("/pedidos/{id}/fisico")
   @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<Result<Void>> eliminarPedidoFisico(@PathVariable Long id) {
@@ -74,7 +74,7 @@ public class PedidoController {
     return ResponseEntity.ok(Result.success("Pedido eliminado físicamente", null));
   }
 
-  @Operation(summary = "Logically delete an order (alternative)")
+  @Operation(summary = "Eliminar lógicamente un pedido (alternativo)")
   @DeleteMapping("/pedidos/{id}/logico")
   @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<Result<Void>> eliminarPedidoLogico(@PathVariable Long id) {

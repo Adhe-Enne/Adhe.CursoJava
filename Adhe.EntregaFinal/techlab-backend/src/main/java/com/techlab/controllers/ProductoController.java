@@ -23,7 +23,7 @@ public class ProductoController {
     this.productoService = productoService;
   }
 
-  @Operation(summary = "List all products")
+  @Operation(summary = "Listar todos los productos")
   @GetMapping
   public ResponseEntity<Result<List<ProductoDto>>> listar() {
     List<Producto> productos = productoService.listarProductos();
@@ -31,7 +31,7 @@ public class ProductoController {
     return ResponseEntity.ok(Result.success(dtos));
   }
 
-  @Operation(summary = "Search products by name")
+  @Operation(summary = "Buscar productos por nombre")
   @GetMapping("/buscar")
   public ResponseEntity<Result<List<ProductoDto>>> buscarPorNombre(
       @RequestParam(value = "nombre", required = false) String nombre) {
@@ -40,7 +40,7 @@ public class ProductoController {
     return ResponseEntity.ok(Result.success(dtos));
   }
 
-  @Operation(summary = "List products by category")
+  @Operation(summary = "Listar productos por categoría")
   @GetMapping("/categoria/{categoriaId}")
   public ResponseEntity<Result<List<ProductoDto>>> listarPorCategoria(@PathVariable Long categoriaId) {
     List<Producto> productos = productoService.listarPorCategoria(categoriaId);
@@ -48,7 +48,7 @@ public class ProductoController {
     return ResponseEntity.ok(Result.success(dtos));
   }
 
-  @Operation(summary = "Create a new product")
+  @Operation(summary = "Crear un nuevo producto")
   @PostMapping
   @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<Result<ProductoDto>> crear(@Valid @RequestBody ProductoDto productoDto) {
@@ -58,14 +58,14 @@ public class ProductoController {
         .body(Result.success("Producto creado exitosamente", DtoMapper.toDto(creado)));
   }
 
-  @Operation(summary = "Get a product by ID")
+  @Operation(summary = "Obtener un producto por ID")
   @GetMapping("/{id}")
   public ResponseEntity<Result<ProductoDto>> obtener(@PathVariable Long id) {
     Producto producto = productoService.obtenerProductoPorId(id);
     return ResponseEntity.ok(Result.success(DtoMapper.toDto(producto)));
   }
 
-  @Operation(summary = "Update a product by ID")
+  @Operation(summary = "Actualizar un producto por ID")
   @PutMapping("/{id}")
   @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<Result<ProductoDto>> actualizar(@PathVariable Long id,
@@ -75,7 +75,7 @@ public class ProductoController {
     return ResponseEntity.ok(Result.success("Producto actualizado exitosamente", DtoMapper.toDto(actualizado)));
   }
 
-  @Operation(summary = "Physically delete a product by ID")
+  @Operation(summary = "Eliminar físicamente un producto por ID")
   @DeleteMapping("/{id}/fisico")
   @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<Result<Void>> eliminarFisico(@PathVariable Long id) {
@@ -83,7 +83,7 @@ public class ProductoController {
     return ResponseEntity.ok(Result.success("Producto eliminado físicamente", null));
   }
 
-  @Operation(summary = "Logically delete a product by ID (alternative)")
+  @Operation(summary = "Eliminar lógicamente un producto por ID (alternativo)")
   @DeleteMapping("/{id}/logico")
   @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<Result<Void>> eliminarLogico(@PathVariable Long id) {

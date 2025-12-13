@@ -8,6 +8,8 @@ public class UsuarioResponse {
   private String email;
   private Boolean deleted;
   private LocalDateTime deletedAt;
+  private String role;
+  private LocalDateTime updatedAt;
 
   public Long getId() {
     return id;
@@ -47,5 +49,21 @@ public class UsuarioResponse {
 
   public void setDeletedAt(LocalDateTime deletedAt) {
     this.deletedAt = deletedAt;
+  }
+
+  public String getRole() {
+    return role;
+  }
+
+  public void setRole(String role) {
+    this.role = role;
+  }
+
+  public LocalDateTime getUpdatedAt() {
+    return updatedAt;
+  }
+
+  public void setUpdatedAt(LocalDateTime updatedAt) {
+    this.updatedAt = updatedAt;
   }
 }
