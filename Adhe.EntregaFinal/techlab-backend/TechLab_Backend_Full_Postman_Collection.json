@@ -1,0 +1,539 @@
+{
+  "info": {
+    "name": "TechLab Backend - All Endpoints",
+    "_postman_id": "adhe-techlab-all-endpoints",
+    "description": "Automatically generated Postman collection including all API endpoints (logical and physical delete). Update variables `baseUrl` and `token` before use.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8080", "type": "string" },
+    { "key": "token", "value": "", "type": "string" }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"password\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "login"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Nuevo Usuario\",\n  \"email\": \"user@example.com\",\n  \"password\": \"secret123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "register"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Usuarios",
+      "item": [
+        {
+          "name": "Crear Usuario",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Juan Perez\",\n  \"email\": \"juan@example.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/usuarios",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "usuarios"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Listar Usuarios",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/usuarios",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "usuarios"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener Usuario por ID",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/usuarios/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "usuarios", ":id"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Buscar Usuario por Email",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/usuarios/buscar?email=user@example.com",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "usuarios", "buscar"],
+              "query": [{ "key": "email", "value": "user@example.com" }]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Actualizar Usuario",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Juan Actualizado\",\n  \"email\": \"juan.updated@example.com\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/usuarios/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "usuarios", ":id"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Cambiar Rol",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/usuarios/:id/role?role=ADMIN",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "usuarios", ":id", "role"],
+              "query": [{ "key": "role", "value": "ADMIN" }]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Eliminar Usuario (lógico)",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/usuarios/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "usuarios", ":id"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Eliminar Usuario (lógico) - /logico",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/usuarios/:id/logico",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "usuarios", ":id", "logico"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Eliminar Usuario (físico)",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/usuarios/:id/fisico",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "usuarios", ":id", "fisico"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Productos",
+      "item": [
+        {
+          "name": "Listar Productos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/productos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "productos"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Buscar Productos por nombre",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/productos/buscar?nombre=camisa",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "productos", "buscar"],
+              "query": [{ "key": "nombre", "value": "camisa" }]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Listar por categoria",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/productos/categoria/:categoriaId",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "productos", "categoria", ":categoriaId"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Crear Producto",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Camiseta\",\n  \"descripcion\": \"Camiseta de algodón\",\n  \"precio\": 19.99,\n  \"stock\": 100,\n  \"categoriaId\": 1,\n  \"imagenUrl\": \"http://example.com/img.jpg\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/productos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "productos"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener Producto por ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/productos/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "productos", ":id"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Actualizar Producto",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Camiseta Actualizada\",\n  \"precio\": 24.99\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/productos/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "productos", ":id"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Eliminar Producto (lógico)",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/productos/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "productos", ":id"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Eliminar Producto (lógico) - /logico",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/productos/:id/logico",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "productos", ":id", "logico"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Eliminar Producto (físico)",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/productos/:id/fisico",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "productos", ":id", "fisico"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Categorias",
+      "item": [
+        {
+          "name": "Listar Categorias",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/categorias",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "categorias"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Crear Categoria",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Ropa\",\n  \"descripcion\": \"Categoría ropa\",\n  \"activo\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/categorias",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "categorias"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener Categoria por ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/categorias/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "categorias", ":id"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Actualizar Categoria",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Ropa Actualizada\",\n  \"descripcion\": \"Descripción nueva\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/categorias/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "categorias", ":id"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Eliminar Categoria (lógico)",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/categorias/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "categorias", ":id"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Eliminar Categoria (lógico) - /logico",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/categorias/:id/logico",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "categorias", ":id", "logico"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Eliminar Categoria (físico)",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/categorias/:id/fisico",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "categorias", ":id", "fisico"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Pedidos",
+      "item": [
+        {
+          "name": "Crear Pedido",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"usuarioId\": 1,\n  \"itemsPedido\": [ { \"productoId\": 1, \"cantidad\": 2 } ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/pedidos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "pedidos"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Listar Pedidos por Usuario",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/usuarios/:id/pedidos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "usuarios", ":id", "pedidos"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Listar Pedidos",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/pedidos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "pedidos"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Actualizar Estado Pedido",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"estado\": \"ENVIADO\"\n}" },
+            "url": {
+              "raw": "{{baseUrl}}/api/pedidos/:id/estado",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "pedidos", ":id", "estado"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Eliminar Pedido (lógico)",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/pedidos/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "pedidos", ":id"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Eliminar Pedido (lógico) - /logico",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/pedidos/:id/logico",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "pedidos", ":id", "logico"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Eliminar Pedido (físico)",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/pedidos/:id/fisico",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "pedidos", ":id", "fisico"]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
