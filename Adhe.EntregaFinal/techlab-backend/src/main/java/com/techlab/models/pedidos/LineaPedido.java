@@ -2,18 +2,21 @@ package com.techlab.models.pedidos;
 
 import jakarta.persistence.*;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PositiveOrZero;
 
 @Entity
-public class LineaPedido {
+public class LineaPedido extends com.techlab.models.BaseEntity {
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
-
+  @NotNull(message = "El ID del producto no puede ser nulo.")
   private Long productoId;
 
+  @NotNull(message = "La cantidad no puede ser nula.")
+  @Min(value = 1, message = "La cantidad debe ser al menos 1.")
   private Integer cantidad;
 
+  @PositiveOrZero(message = "El subtotal no puede ser negativo.")
   private Double subtotal;
 
   @ManyToOne(fetch = FetchType.LAZY)
@@ -22,13 +25,6 @@ public class LineaPedido {
   private Pedido pedido;
 
   // Getters y setters
-  public Long getId() {
-    return id;
-  }
-
-  public void setId(Long id) {
-    this.id = id;
-  }
 
   public Long getProductoId() {
     return productoId;

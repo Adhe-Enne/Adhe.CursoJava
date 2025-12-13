@@ -4,11 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 
 @Entity
-public class Producto {
-
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
+public class Producto extends com.techlab.models.BaseEntity {
 
   @NotNull(message = "El nombre no puede ser nulo")
   @Size(min = 2, max = 100, message = "El nombre debe tener entre 2 y 100 caracteres")
@@ -32,14 +28,6 @@ public class Producto {
   private String imagenUrl;
 
   // Getters y Setters
-  public Long getId() {
-    return id;
-  }
-
-  public void setId(Long id) {
-    this.id = id;
-  }
-
   public String getNombre() {
     return nombre;
   }
